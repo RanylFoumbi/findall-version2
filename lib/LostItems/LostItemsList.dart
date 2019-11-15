@@ -2,9 +2,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:findall/FakeData/FoundModel.dart';
 import 'package:findall/FoundItems/FoundedItemsList.dart';
-import 'package:findall/GlobalComponents/BottomNavigationBar.dart';
+import 'package:findall/GlobalComponents/BottomNavigationItems.dart';
+import 'package:findall/GlobalComponents/SearchItems.dart';
 import 'package:findall/Home/HomePage.dart';
-import 'package:findall/LostItems/PostAnnounceForm.dart';
+import 'package:findall/Announce/PostAnnounceForm.dart';
+import 'package:findall/LostItems/DetailPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -23,8 +25,7 @@ class LostItemsListState extends State<LostItemsList> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    lostList = getFoundList();
+    lostList = Found().getFoundList();
   }
 
   @override
@@ -79,7 +80,7 @@ class LostItemsListState extends State<LostItemsList> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
-                                Text(lostList[index].objectName, style: Theme.of(context).textTheme.title,overflow: TextOverflow.ellipsis,textAlign: TextAlign.left),
+                                Text(lostList[index].objectName, style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),overflow: TextOverflow.ellipsis,textAlign: TextAlign.left),
                               ],
                             ),
 
@@ -91,7 +92,7 @@ class LostItemsListState extends State<LostItemsList> {
                                   children: <Widget>[
                                     Icon(Icons.date_range, color: Colors.pink, size: 15,),
                                     SizedBox(width: 5 ),
-                                    Text(lostList[index].date, style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13), overflow: TextOverflow.ellipsis,)
+                                    Text(lostList[index].date, style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway'), overflow: TextOverflow.ellipsis)
                                   ],
                                 )
                             ),
@@ -105,9 +106,9 @@ class LostItemsListState extends State<LostItemsList> {
                                   children: <Widget>[
                                     Icon(Icons.location_city, color: Colors.pink, size: 15),
                                     SizedBox(width: 5),
-                                    Text('Ville:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11)),
+                                    Text('Ville:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
                                     SizedBox(width: 3),
-                                    Text(lostList[index].town,style: TextStyle(fontWeight: FontWeight.bold)),
+                                    Text(lostList[index].town,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13)),
                                   ]
                               ),
                             ),
@@ -121,9 +122,9 @@ class LostItemsListState extends State<LostItemsList> {
                                   children: <Widget>[
                                     Icon(Icons.my_location, color: Colors.pink, size: 15),
                                     SizedBox(width: 5),
-                                    Text('Quartier:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11)),
+                                    Text('Quartier:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
                                     SizedBox(width: 3),
-                                    Text(lostList[index].quarter,style: TextStyle(fontWeight: FontWeight.bold)),
+                                    Text(lostList[index].quarter,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13)),
                                   ]
                               ),
                             ),
@@ -135,9 +136,11 @@ class LostItemsListState extends State<LostItemsList> {
                               width: width/2.2,
                               child: Row(
                                   children: <Widget>[
-                                    Text('Reward Amount:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11)),
+                                    Icon(Icons.monetization_on, color: Colors.pink, size: 15),
+                                    SizedBox(width: 5),
+                                    Text('Reward Amount:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
                                     SizedBox(width: 3),
-                                    Text(lostList[index].rewardAmount,style: TextStyle(fontWeight: FontWeight.bold)),
+                                    Text(lostList[index].rewardAmount,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13)),
                                   ]
                               ),
                             ),
@@ -153,7 +156,27 @@ class LostItemsListState extends State<LostItemsList> {
                 )
             ),
           ),
-          onTap: (){},
+          onTap: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder:
+                      (context) => DetailLostPage (
+                    index: index,
+                    objectName:lostList[index].objectName,
+                    description: lostList[index].description,
+                    contact: lostList[index].phone,
+                    postBy: lostList[index].postBy,
+                    images: lostList[index].imageUrl,
+                    date: lostList[index].date,
+                    profileImg: lostList[index].profileImg,
+                    quarter: lostList[index].quarter,
+                    town: lostList[index].town,
+                    rewardAmount: lostList[index].rewardAmount,
+                  )
+              ),
+            );
+          },
         )
     );
 
@@ -187,6 +210,17 @@ class LostItemsListState extends State<LostItemsList> {
       }
       break;
 
+      case 2: {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => LostItemsList()
+          ),
+        );
+      }
+      break;
+
+
       case 3: {
         Navigator.push(
           context,
@@ -198,8 +232,14 @@ class LostItemsListState extends State<LostItemsList> {
       break;
 
       case 4: {
-
+          showSearch(
+                context: context,
+                delegate: SearchItems(),
+                query: ''
+          );
       }
+
+
       break;
     }
 
@@ -207,6 +247,7 @@ class LostItemsListState extends State<LostItemsList> {
 
   @override
   Widget build(BuildContext context) {
+    print('ranolf');
     // TODO: implement build
     return WillPopScope(
       child: Scaffold(
@@ -217,14 +258,14 @@ class LostItemsListState extends State<LostItemsList> {
             Row(
               children: <Widget>[
                 SizedBox(width: 5),
-                Text('Lost objects',textAlign: TextAlign.left,style: Theme.of(context).textTheme.title),
+                Text('Lost objects',textAlign: TextAlign.left,style: TextStyle(fontWeight: FontWeight.w700,fontSize: 25,fontFamily: 'Raleway')),
               ],
             ),
 
             Row(
               children: <Widget>[
                 SizedBox(width: 5),
-                Text('About (4) objects',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11)),
+                Text('About (4) objects',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 13,fontFamily: 'Raleway')),
               ],
             ),
 
@@ -233,7 +274,7 @@ class LostItemsListState extends State<LostItemsList> {
               child: ListView.builder(
                 itemBuilder: _buildLostItem,
                 scrollDirection: Axis.vertical,
-                itemCount: 4,
+                itemCount: lostList.length,
               ),
             )
           ],
@@ -241,28 +282,7 @@ class LostItemsListState extends State<LostItemsList> {
         bottomNavigationBar: BottomNavigationBar(
           showUnselectedLabels: false,
           showSelectedLabels: true,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              title: Text('Home'),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.view_list),
-              title: Text('Found items'),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance),
-              title: Text('Lost items'),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.public),
-              title: Text('Post annou..'),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              title: Text('My account'),
-            ),
-          ],
+          items: bottomNavigationItems(),
           currentIndex: _selectedIndex,
           selectedItemColor: Colors.deepPurple,
           unselectedItemColor: Colors.black54,
@@ -275,72 +295,3 @@ class LostItemsListState extends State<LostItemsList> {
 
 }
 
-List getFoundList(){
-  return [
-    Found(
-        objectName: 'Mobile Phone',
-        town: 'Yaounde',
-        quarter: 'Bastos',
-        phone: '656894756',
-        date: '15 Janvier 2019 15h45',
-        isLost: true,
-        postBy: 'Fergiestella Tina',
-        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy",
-        imageUrl: [
-          "https://images.pexels.com/photos/237018/pexels-photo-237018.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-          "https://images.pexels.com/photos/1319911/pexels-photo-1319911.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-          "https://images.pexels.com/photos/1133957/pexels-photo-1133957.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-        ],
-      rewardAmount: r"$5"
-    ),
-    Found(
-        objectName: 'Certificates',
-        town: 'Yaounde',
-        quarter: 'Bastos',
-        phone: '656894756',
-        date: '15 Janvier 2019 15h45',
-        isLost: true,
-        postBy: 'Fergiestella Tina',
-        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy",
-        imageUrl: [
-          "https://images.pexels.com/photos/1133957/pexels-photo-1133957.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-          "https://images.pexels.com/photos/237018/pexels-photo-237018.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-          "https://images.pexels.com/photos/1319911/pexels-photo-1319911.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-        ],
-      rewardAmount: r"$8"
-    ),
-    Found(
-        objectName: 'Passport',
-        town: 'Yaounde',
-        quarter: 'Bastos',
-        phone: '656894756',
-        date: '15 Janvier 2019 15h45',
-        isLost: true,
-        postBy: 'Fergiestella Tina',
-        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy",
-        imageUrl: [
-          "https://images.pexels.com/photos/1319911/pexels-photo-1319911.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-          "https://images.pexels.com/photos/237018/pexels-photo-237018.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-          "https://images.pexels.com/photos/1133957/pexels-photo-1133957.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-        ],
-        rewardAmount: r"$15"
-    ),
-    Found(
-        objectName: 'Identity Card',
-        town: 'Yaounde',
-        quarter: 'Bastos',
-        phone: '656894756',
-        date: '15 Janvier 2019 15h45',
-        isLost: true,
-        postBy: 'Fergiestella Tina',
-        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy",
-        imageUrl: [
-          "https://images.pexels.com/photos/999515/pexels-photo-999515.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-          "https://images.pexels.com/photos/237018/pexels-photo-237018.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-          "https://images.pexels.com/photos/1319911/pexels-photo-1319911.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-          "https://images.pexels.com/photos/1133957/pexels-photo-1133957.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-        ],
-        rewardAmount: r"$10"
-    )
-  ];
-}

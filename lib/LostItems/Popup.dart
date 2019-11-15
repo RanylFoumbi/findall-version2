@@ -17,16 +17,20 @@ class PopupState extends State<Popup> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return SimpleDialog(
-      backgroundColor: Colors.white,
-      shape: OutlineInputBorder(borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Color(0xffdcdcdc))),
-      contentPadding: EdgeInsets.only(left: 25,top: 25,right: 15,bottom: 25),
-      children: <Widget>[
+    return
+      SimpleDialog(
+        backgroundColor: Colors.white,
+        shape: OutlineInputBorder(borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Color(0xffdcdcdc))),
+        contentPadding: EdgeInsets.only(left: 25,top: 25,right: 15,bottom: 25),
+        children: <Widget>[
 
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text('Where?',textAlign: TextAlign.left,style: TextStyle(fontWeight: FontWeight.w600)),
+            Text('Where?',textAlign: TextAlign.left,style: TextStyle(fontWeight: FontWeight.w600,fontFamily: 'Raleway')),
+
+            SizedBox(height: 2),
+            
             new Container(
                 width: 230,
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),border: Border.all(color: Color(0xffdcdcdc))),
@@ -35,11 +39,19 @@ class PopupState extends State<Popup> {
                   child: new DropdownButton<String>(
                       iconEnabledColor: Color(0xffdcdcdc),
                       iconSize: 40,
-                      style: TextStyle(fontWeight: FontWeight.w700,color: Colors.black),
+                      style: TextStyle(fontWeight: FontWeight.w700,color: Colors.black,fontFamily: 'Raleway'),
                       hint:  _townName == null ?
-                      Text(_townName = "Yaoundé")
+                      Text(_townName = "Yaoundé",
+                        style: TextStyle(
+                            fontFamily: 'Raleway'
+                        ),
+                      )
                           :
-                      Text(_townName),
+                      Text(_townName,
+                        style: TextStyle(
+                            fontFamily: 'Raleway'
+                        ),
+                      ),
                       onChanged: (String changedValue) {
                         _townName = changedValue;
                         setState(() {
@@ -51,7 +63,11 @@ class PopupState extends State<Popup> {
                           .map((String value) {
                         return new DropdownMenuItem<String>(
                           value: value,
-                          child: new Text(value),
+                          child: new Text(value,
+                            style: TextStyle(
+                                fontFamily: 'Raleway'
+                            ),
+                          ),
                         );
                       }).toList()
                   ),
@@ -74,7 +90,9 @@ class PopupState extends State<Popup> {
                   autofocus: false,
                   decoration: InputDecoration(
                     hintText: 'Autre ville**',
-                    hintStyle: TextStyle(fontSize: 13,fontStyle: FontStyle.italic),
+                    hintStyle: TextStyle(fontSize: 13,fontStyle: FontStyle.italic,
+                          fontFamily: 'Raleway'
+                    ),
                     prefixIcon: Icon(
                         Icons.location_city,
                         color: Color(0xffdcd3d3)
@@ -94,7 +112,10 @@ class PopupState extends State<Popup> {
 
             SizedBox(height: 15),
 
-            Text('When?',textAlign: TextAlign.left,style: TextStyle(fontWeight: FontWeight.w600)),
+            Text('When?',textAlign: TextAlign.left,style: TextStyle(fontWeight: FontWeight.w600,fontFamily: 'Raleway')),
+
+            SizedBox(height: 2),
+
             new Container(
                 width: 230,
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),border: Border.all(color: Color(0xffdcdcdc))),
@@ -105,9 +126,17 @@ class PopupState extends State<Popup> {
                       iconSize: 40,
                       style: TextStyle(fontWeight: FontWeight.w700,color: Colors.black),
                       hint:  _dayLeft == null ?
-                      Text(_dayLeft = "more than 3 days")
+                      Text(_dayLeft = "more than 3 days",
+                        style: TextStyle(
+                            fontFamily: 'Raleway'
+                        ),
+                      )
                           :
-                      Text(_dayLeft),
+                      Text(_dayLeft,
+                        style: TextStyle(
+                            fontFamily: 'Raleway'
+                        ),
+                      ),
                       onChanged: (String changedValue) {
                         _dayLeft = changedValue;
                         setState(() {
@@ -119,7 +148,11 @@ class PopupState extends State<Popup> {
                           .map((String value) {
                         return new DropdownMenuItem<String>(
                           value: value,
-                          child: new Text(value),
+                          child: new Text(value,
+                            style: TextStyle(
+                                fontFamily: 'Raleway'
+                            ),
+                          ),
                         );
                       }).toList()
                   ),
@@ -138,7 +171,7 @@ class PopupState extends State<Popup> {
                   width: 85,
                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Colors.pink),
                   child: FloatingActionButton.extended(
-                    label: Text('Cancel',style: TextStyle(color: Colors.pink),),
+                    label: Text('Cancel',style: TextStyle(color: Colors.pink,fontFamily: 'Raleway'),),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)
                     ),
@@ -156,7 +189,11 @@ class PopupState extends State<Popup> {
                     height: 40,
                     width: 85,
                     child:FloatingActionButton.extended(
-                      label: Text('Next'),
+                      label: Text('Next',
+                        style: TextStyle(
+                          fontFamily: 'Raleway'
+                        ),
+                      ),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)
                       ),

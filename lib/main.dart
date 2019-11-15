@@ -6,7 +6,6 @@ import 'package:findall/Home/HomePage.dart';
 void main() {
 
   WidgetsFlutterBinding.ensureInitialized();
-//  NativeAds.initialize();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown,DeviceOrientation.portraitUp])
       .then((_) {
     runApp(new Main());
