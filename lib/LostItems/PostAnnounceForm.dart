@@ -1,5 +1,6 @@
 
 import 'package:findall/Announce/ResumeAnnouncePage.dart';
+import 'package:findall/Authentication/AuthPage.dart';
 import 'package:findall/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/BottomNavigationItems.dart';
 import 'package:findall/GlobalComponents/SearchItems.dart';
@@ -14,10 +15,10 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 class PostAnnounceForm extends StatefulWidget {
 
   @override
-  PostAnnounceFormState createState() => PostAnnounceFormState();
+  _PostAnnounceFormState createState() => _PostAnnounceFormState();
 }
 
-class PostAnnounceFormState extends State<PostAnnounceForm> {
+class _PostAnnounceFormState extends State<PostAnnounceForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   var _otherObjectController = TextEditingController();
   var _otherTownController = TextEditingController();
@@ -133,6 +134,16 @@ class PostAnnounceFormState extends State<PostAnnounceForm> {
         );
       }
       break;
+
+      case 5:{
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => AuthPage()
+          ),
+        );
+      }
+      break;
     }
 
   }
@@ -236,7 +247,6 @@ class PostAnnounceFormState extends State<PostAnnounceForm> {
         )
     );
 
-
     final otherObject = TextFormField(
       controller: _otherObjectController,
       keyboardType: TextInputType.text,
@@ -260,7 +270,6 @@ class PostAnnounceFormState extends State<PostAnnounceForm> {
         ),
       ),
     );
-
 
     final townTitle =  new Container(
         width: width/1.15,
@@ -426,22 +435,121 @@ class PostAnnounceFormState extends State<PostAnnounceForm> {
      },
    );
 
-    final camera = Card(
-      child: Row(
-        children: <Widget>[
-          SizedBox(height: 110, width: 0),
-          _isLoading ?
-          Text("butoi",style: TextStyle(color: Colors.white))
-              :
-          _imageList.length < 4 ?
-          IconButton(icon: Icon(Icons.file_upload, color: Colors.pink,size: 30), onPressed: (){
-//            Dialog(context);
-          })
-              :
-          Text("butoi",style: TextStyle(color: Colors.white)),
+    final camera =  Card(
+        color: Colors.white,
+        child:Container(
+          width: width/1.1,
+          height: height/3,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+          padding: EdgeInsets.only(top: 15,bottom: 15),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
 
-          displayImage(),
-        ],
+                  Container(
+                    width: width/4.5,
+                    height: height/8,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
+                    padding: EdgeInsets.all(2),
+                    child:GestureDetector(
+                      child: Image.asset(
+                          'assets/images/foret.jpeg',
+                          width: width/4.5,
+                          height: height/8,
+                          fit: BoxFit.cover
+                      ),
+                    )
+                  ),
+
+                  SizedBox(width: 25),
+
+                  Container(
+                      width: width/4.5,
+                      height: height/8,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
+                      padding: EdgeInsets.all(2),
+                      child:GestureDetector(
+                        child: Icon(Icons.add_circle,size: 25,color: Colors.pink,),
+                      )
+                  ),
+
+                  SizedBox(width: 25),
+
+                  Container(
+                      width: width/4.5,
+                      height: height/8,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
+                      padding: EdgeInsets.all(2),
+                      child:GestureDetector(
+                        child: Image.asset(
+                            'assets/images/mer.jpeg',
+                            width: width/4.5,
+                            height: height/8,
+                            fit: BoxFit.cover
+                        ),
+                      )
+                  )
+
+                ],
+              ),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+
+                  Container(
+                      width: width/4.5,
+                      height: height/8,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
+                      padding: EdgeInsets.all(2),
+                      child:GestureDetector(
+                        child: Icon(Icons.add_circle,size: 25,color: Colors.pink,),
+                      )
+                  ),
+
+                  SizedBox(width: 25),
+
+                  Container(
+                      width: width/4.5,
+                      height: height/8,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
+                      padding: EdgeInsets.all(2),
+                      child:GestureDetector(
+                        child: Image.asset(
+                            'assets/images/jardin.jpeg',
+                            width: width/4.5,
+                            height: height/8,
+                            fit: BoxFit.cover
+                        ),
+                      )
+                  ),
+
+                  SizedBox(width: 25),
+
+                  Container(
+                      width: width/4.5,
+                      height: height/8,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
+                      padding: EdgeInsets.all(2),
+                      child:GestureDetector(
+                        child: Icon(Icons.add_circle,size: 25,color: Colors.pink,),
+                      )
+                  )
+
+                ],
+              ),
+            ],
+          ),
       ),
 
     );

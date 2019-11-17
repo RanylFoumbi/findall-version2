@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:findall/Authentication/AuthPage.dart';
 import 'package:findall/FakeData/FoundModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -7,10 +8,10 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 class ResumeAnnounce extends StatefulWidget {
 
 @override
-ResumeAnnounceState createState() => ResumeAnnounceState();
+_ResumeAnnounceState createState() => _ResumeAnnounceState();
 }
 
-class ResumeAnnounceState extends State<ResumeAnnounce> {
+class _ResumeAnnounceState extends State<ResumeAnnounce> {
 
   List foundList;
   @override
@@ -52,7 +53,7 @@ class ResumeAnnounceState extends State<ResumeAnnounce> {
                       child: Text('Resume of your Announcement',textAlign: TextAlign.center,style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700,fontFamily: 'Raleway'))
                   ),
 
-                  SizedBox(height: 70),
+                  SizedBox(height: 50),
                 ],
               ),
 
@@ -78,6 +79,7 @@ class ResumeAnnounceState extends State<ResumeAnnounce> {
                       ),
                     ),
 
+                    SizedBox(height: 8 ),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,7 +90,7 @@ class ResumeAnnounceState extends State<ResumeAnnounce> {
 
                       ],
                     ),
-                    SizedBox(height: 8 ),
+                    SizedBox(height: 13 ),
                     Row(
                       children: <Widget>[
                         Icon(Icons.date_range, color: Colors.pink, size: 15),
@@ -99,7 +101,7 @@ class ResumeAnnounceState extends State<ResumeAnnounce> {
                       ],
                     ),
 
-                    SizedBox(height: 5 ),
+                    SizedBox(height: 8 ),
                     Row(
                         children: <Widget>[
                           Icon(Icons.location_city, color: Colors.pink, size: 15),
@@ -110,7 +112,7 @@ class ResumeAnnounceState extends State<ResumeAnnounce> {
                         ]
                     ),
 
-                    SizedBox(height: 5 ),
+                    SizedBox(height: 8 ),
 
                     Row(
                         children: <Widget>[
@@ -122,7 +124,7 @@ class ResumeAnnounceState extends State<ResumeAnnounce> {
                         ]
                     ),
 
-                    SizedBox(height: 5 ),
+                    SizedBox(height: 8 ),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -136,7 +138,7 @@ class ResumeAnnounceState extends State<ResumeAnnounce> {
                       ],
                     ),
 
-                    SizedBox(height: 10 ),
+                    SizedBox(height: 13 ),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -179,13 +181,13 @@ class ResumeAnnounceState extends State<ResumeAnnounce> {
                               backgroundColor: Colors.deepPurple,
                               heroTag: "proceed",
                               onPressed: (){
-                                /*Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => FoundedItemsList()
-                            ),
+                                Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => AuthPage()
+                                      ),
 
-                          );*/
+                                );
                               },
                             )
                         )
