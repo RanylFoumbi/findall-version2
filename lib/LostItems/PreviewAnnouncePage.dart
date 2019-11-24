@@ -1,24 +1,46 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:findall/Authentication/AuthPage.dart';
 import 'package:findall/FakeData/FoundModel.dart';
+import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 
 
-class ResumeAnnounce extends StatefulWidget {
+class PreviewAnnounce extends StatefulWidget {
 
-@override
-_ResumeAnnounceState createState() => _ResumeAnnounceState();
+
+  final String objectName;
+  final String description;
+  final String town;
+  final String quarter;
+  final String date;
+  final String contact;
+  final String rewardAmount;
+  final List images;
+
+  PreviewAnnounce({Key key,
+    this.objectName,
+    this.description,
+    this.town,
+    this.quarter,
+    this.contact,
+    this.images,
+    this.date,
+    this.rewardAmount
+  }) : super(key: key);
+
+  @override
+  _PreviewAnnounceState createState() => _PreviewAnnounceState();
 }
 
-class _ResumeAnnounceState extends State<ResumeAnnounce> {
+class _PreviewAnnounceState extends State<PreviewAnnounce> {
 
-  List foundList;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    foundList = Found().getFoundList();
   }
 
   @override
@@ -50,7 +72,7 @@ class _ResumeAnnounceState extends State<ResumeAnnounce> {
                 children: <Widget>[
                   SizedBox(width: 5),
                   Expanded(
-                      child: Text('Resume of your Announcement',textAlign: TextAlign.center,style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700,fontFamily: 'Raleway'))
+                      child: Text('Preview of your Announcement',textAlign: TextAlign.center,style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700,fontFamily: 'Raleway'))
                   ),
 
                   SizedBox(height: 50),
@@ -60,68 +82,125 @@ class _ResumeAnnounceState extends State<ResumeAnnounce> {
 
               new Expanded(
                 child: ListView(
-                  padding: EdgeInsets.only(left: 8,right: 8,bottom: 15),
-//                  crossAxisAlignment: CrossAxisAlignment.start,
+                  padding: EdgeInsets.only(left: 13,right: 13,top: 15,bottom: 30),
                   children: <Widget>[
 
-                    new Container(
+                    Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xffeaeff2), width: 0.5),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                                color: Color(0xffd4d4d4),
+                                blurRadius: 10.0, // has the effect of softening the shadow
+                                offset: Offset(0, 4)
+                            )
+                          ]
+                      ),
                       width: width,
-                      height: height/2.7,
-                      padding: const EdgeInsets.all(3.0),
-                      child:CachedNetworkImage(
-                        width: width/1.1,
-                        height: height/2.7,
-                        fit: BoxFit.cover,
-                        repeat: ImageRepeat.noRepeat,
-                        imageUrl: foundList[0].imageUrl[0],
-                        placeholder: (context, url) => new SpinKitWave(color: Colors.deepPurple,size: 40),
-                        errorWidget: (context, url, error) => new Icon(Icons.error,color: Colors.deepPurple),
+                      height: height / 2,
+                      child: new Swiper(
+                        itemWidth: height / 1.8,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(0),
+                              child: Image.file(
+                                  widget.images[index],
+                                  width: width/1.1,
+                                  height: height/2.7,
+                                  fit: BoxFit.cover
+                              ),
+                            ),
+                            onTap: () {
+                              photoView(context, widget.images[index]);
+                            },
+                          );
+                        },
+                        itemCount: widget.images.length,
+                        autoplay: true,
+                        pagination: new SwiperPagination(margin: EdgeInsets.all(0),),
+                        control: new SwiperControl(
+                          padding: EdgeInsets.all(0),
+                          color: Colors.deepPurple,
+                          size: 0,
+                          iconPrevious: null,
+                          iconNext: null,
+                        ),
                       ),
                     ),
 
-                    SizedBox(height: 8 ),
+                    SizedBox(height: 15 ),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Expanded(
-                          child: Text(foundList[0].objectName, style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700,fontFamily: 'Raleway')),
+                          child: Text(widget.objectName, style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700,fontFamily: 'Raleway')),
                         ),
 
                       ],
                     ),
-                    SizedBox(height: 13 ),
+                    SizedBox(height: 15 ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Icon(Icons.date_range, color: Colors.pink, size: 15),
                         SizedBox(width: 5),
-                        Text('Lost the:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway'), overflow: TextOverflow.ellipsis,),
+                        Text('Lost the:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
                         SizedBox(width: 5 ),
-                        Text(foundList[0].date, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway'), overflow: TextOverflow.ellipsis,)
+                        Expanded(
+                            child: Text(widget.date, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway'))
+                        )
                       ],
                     ),
 
                     SizedBox(height: 8 ),
                     Row(
-                        children: <Widget>[
-                          Icon(Icons.location_city, color: Colors.pink, size: 15),
-                          SizedBox(width: 5),
-                          Text('Lost at:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway'), overflow: TextOverflow.ellipsis,),
-                          SizedBox(width: 3),
-                          Text(foundList[0].town + ',' +foundList[0].quarter,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway')),
-                        ]
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Icon(Icons.location_city, color: Colors.pink, size: 15),
+                        SizedBox(width: 5),
+                        Text('Lost at:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
+                        SizedBox(width: 5 ),
+                        Expanded(
+                            child: Text(widget.town, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway'))
+                        )
+                      ],
                     ),
 
                     SizedBox(height: 8 ),
 
                     Row(
-                        children: <Widget>[
-                          Icon(Icons.monetization_on, color: Colors.pink, size: 15),
-                          SizedBox(width: 5),
-                          Text('Deal offer:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway'), overflow: TextOverflow.ellipsis,),
-                          SizedBox(width: 3),
-                          Text(foundList[0].rewardAmount,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway')),
-                        ]
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Icon(Icons.monetization_on, color: Colors.pink, size: 15),
+                        SizedBox(width: 5),
+                        Text('Deal offer:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
+                        SizedBox(width: 5 ),
+                        Expanded(
+                            child: Text(widget.rewardAmount, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway'))
+                        )
+                      ],
+                    ),
+
+                    SizedBox(height: 8 ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Icon(Icons.phone, color: Colors.pink, size: 15),
+                        SizedBox(width: 5),
+                        Text('Contact:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
+                        SizedBox(width: 5 ),
+                        Expanded(
+                            child: Text(widget.contact, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway'))
+                        )
+                      ],
                     ),
 
                     SizedBox(height: 8 ),
@@ -132,13 +211,16 @@ class _ResumeAnnounceState extends State<ResumeAnnounce> {
                       children: <Widget>[
                         Icon(Icons.description, color: Colors.pink, size: 15),
                         SizedBox(width: 5),
+                        Text('Description:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
+                        SizedBox(width: 5 ),
+                        SizedBox(width: 5),
                         Expanded(
-                          child: Text(foundList[0].description,style: TextStyle(fontSize: 15,fontFamily: 'Raleway')),
+                          child: Text(widget.description,style: TextStyle(fontSize: 15,fontFamily: 'Raleway')),
                         ),
                       ],
                     ),
 
-                    SizedBox(height: 13 ),
+                    SizedBox(height: 30 ),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -170,7 +252,8 @@ class _ResumeAnnounceState extends State<ResumeAnnounce> {
                             height: 40,
                             width: 100,
                             child:FloatingActionButton.extended(
-                              label: Text('Proceed',
+                              icon: Icon(Icons.public,color: Colors.white),
+                              label: Text('Publish',
                                 style: TextStyle(
                                     fontFamily: 'Raleway'
                                 ),
@@ -178,7 +261,7 @@ class _ResumeAnnounceState extends State<ResumeAnnounce> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)
                               ),
-                              backgroundColor: Colors.deepPurple,
+                              backgroundColor: Colors.pink,
                               heroTag: "proceed",
                               onPressed: (){
                                 Navigator.push(

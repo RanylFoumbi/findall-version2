@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 class Popup extends StatefulWidget {
 
   @override
-  PopupState createState() => PopupState();
+  _PopupState createState() => _PopupState();
 }
 
-class PopupState extends State<Popup> {
+class _PopupState extends State<Popup> {
 
   var _othertownController = TextEditingController();
   String _townName;

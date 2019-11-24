@@ -1,11 +1,12 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:findall/Authentication/AuthPage.dart';
 import 'package:findall/FakeData/FoundModel.dart';
 import 'package:findall/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/BottomNavigationItems.dart';
 import 'package:findall/GlobalComponents/SearchItems.dart';
 import 'package:findall/Home/HomePage.dart';
-import 'package:findall/Announce/PostAnnounceForm.dart';
+import 'package:findall/LostItems/PostAnnounceForm.dart';
 import 'package:findall/LostItems/DetailPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -14,10 +15,10 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 class LostItemsList extends StatefulWidget {
 
   @override
-  LostItemsListState createState() => LostItemsListState();
+  _LostItemsListState createState() => _LostItemsListState();
 }
 
-class LostItemsListState extends State<LostItemsList> {
+class _LostItemsListState extends State<LostItemsList> {
   int _selectedIndex = 2;
   List lostList;
 
@@ -232,14 +233,22 @@ class LostItemsListState extends State<LostItemsList> {
       break;
 
       case 4: {
-          showSearch(
-                context: context,
-                delegate: SearchItems(),
-                query: ''
-          );
+        showSearch(
+            context: context,
+            delegate: SearchItems(),
+            query: ''
+        );
       }
+      break;
 
-
+      case 5:{
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => AuthPage()
+          ),
+        );
+      }
       break;
     }
 
@@ -247,7 +256,6 @@ class LostItemsListState extends State<LostItemsList> {
 
   @override
   Widget build(BuildContext context) {
-    print('ranolf');
     // TODO: implement build
     return WillPopScope(
       child: Scaffold(

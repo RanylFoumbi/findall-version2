@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:findall/FoundItems/FoundedItemsList.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:findall/GlobalComponents/BoostResearch.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -36,10 +37,10 @@ class DetailLostPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  DetailLostPageState createState() => DetailLostPageState();
+  _DetailLostPageState createState() => _DetailLostPageState();
 }
 
-class DetailLostPageState extends State<DetailLostPage> {
+class _DetailLostPageState extends State<DetailLostPage> {
 
 
 
@@ -339,7 +340,7 @@ class DetailLostPageState extends State<DetailLostPage> {
       children: <Widget>[
 
         Container(
-          height: 55,
+          height: 50,
           width: width/2.6,
           decoration: BoxDecoration(
               border: Border.all(color: Colors.white),
@@ -353,7 +354,7 @@ class DetailLostPageState extends State<DetailLostPage> {
               ]
           ),
           child: FloatingActionButton.extended(
-            icon: Icon(Icons.call,size: 30,color: Colors.white),
+            icon: Icon(Icons.call,size: 27,color: Colors.white),
             label: Text('Call'),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10)
@@ -367,7 +368,7 @@ class DetailLostPageState extends State<DetailLostPage> {
         ),
 
         Container(
-          height: 55,
+          height: 50,
           width: width/2.6,
           decoration: BoxDecoration(
               border: Border.all(color: Colors.white),
@@ -381,7 +382,7 @@ class DetailLostPageState extends State<DetailLostPage> {
               ]
           ),
           child: FloatingActionButton.extended(
-            icon: Icon(Icons.settings_input_antenna,size: 30,color: Colors.deepPurple),
+            icon: Icon(FontAwesomeIcons.buysellads,size: 27,color: Colors.deepPurple),
             label: Text('Boost',
                 style: TextStyle(color: Colors.deepPurple)
             ),
@@ -391,6 +392,13 @@ class DetailLostPageState extends State<DetailLostPage> {
             backgroundColor: Colors.white,
             heroTag: "boost"+ widget.index.toString(),
             onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder:
+                        (context) => BoostResearchPage(index: widget.index)
+                ),
+              );
 
             },
           ),

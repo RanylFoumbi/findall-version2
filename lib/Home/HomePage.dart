@@ -1,3 +1,4 @@
+import 'package:findall/FoundItems/NewFoundForm.dart';
 import 'package:findall/LostItems/Popup.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -182,7 +183,14 @@ class Home extends StatelessWidget {
                     ),
                     backgroundColor: Colors.deepPurple,
                     heroTag: "new found button",
-                    onPressed: null,
+                    onPressed: (){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => NewFoundForm()
+                          ),
+                       );
+                    },
                   ),
                 ],
               ),

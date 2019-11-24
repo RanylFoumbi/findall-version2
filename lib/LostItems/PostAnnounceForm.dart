@@ -1,5 +1,10 @@
 
-import 'package:findall/Announce/ResumeAnnouncePage.dart';
+import 'dart:io';
+import 'dart:io';
+import 'dart:io';
+import 'dart:io';
+
+import 'package:findall/LostItems/PreviewAnnouncePage.dart';
 import 'package:findall/Authentication/AuthPage.dart';
 import 'package:findall/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/BottomNavigationItems.dart';
@@ -8,8 +13,10 @@ import 'package:findall/Home/HomePage.dart';
 import 'package:findall/LostItems/LostItemsList.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:toast/toast.dart';
 
 
 class PostAnnounceForm extends StatefulWidget {
@@ -48,38 +55,8 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
     // TODO: implement dispose
     super.dispose();
   }
-
-  Widget displayImage(){
-    var rowImage = Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-
-      ],
-    );
-    if(_imageList.length == 0){
-      return Text("Uploads images of the object.",style: TextStyle(color: Colors.black,fontFamily: 'Raleway',fontSize: 13));
-    }
-    else{
-      for(var i=0; i<_imageList.length; i++){
-        _imageList==null
-            ?
-        rowImage
-            :
-        rowImage.children.add(
-            Image.file(
-                _imageList[i],
-                width: 60,
-                height: 80,
-                fit: BoxFit.cover
-            )
-        );
-      }
-
-    }
-    return Row(children: <Widget>[rowImage],mainAxisAlignment: MainAxisAlignment.spaceEvenly,);
-  }
-
-  onItemTapped(int index) {
+  
+  _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -146,6 +123,86 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
       break;
     }
 
+  }
+
+  _getImage(context,index,option) async{
+    var picture;
+    Navigator.of(context).pop();
+    setState(() {
+      _isLoadingImg = true;
+    });
+    if(option == 'camera'){
+      var photo = await ImagePicker.pickImage(source: ImageSource.camera);
+      if(photo == null){
+        Toast.show("Vous devez télécharger au moins une image avant de publier.", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
+      }
+       setState(() {
+         picture = photo;
+       });
+    }
+    else{
+      var photo = await ImagePicker.pickImage(source: ImageSource.gallery);
+      if(photo == null){
+        Toast.show("Vous devez télécharger au moins une image avant de publier.", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
+      }
+      setState(() {
+        picture = photo;
+      });
+    }
+
+    if(_imageList.isEmpty){
+      setState(() {
+        _imageList.add(picture);
+        _isLoadingImg = false;
+      });
+    }
+    else {
+       if(index < _imageList.length){
+         setState(() {
+           _imageList.add(new File('assets/images/map.png'));
+           _imageList[index] = picture;
+           _imageList.remove(new File('assets/images/map.png'));
+         });
+       }
+       else{
+         setState(() {
+           _imageList.add(_imageList[index - 1]);
+           _imageList[index] = picture;
+         });
+       }
+
+    }
+
+  }
+
+  Future _dialog(BuildContext context,index) async {
+    return  showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: const Text('Importer la photo depuis',style: TextStyle(fontSize: 17)),
+            children: <Widget>[
+              SimpleDialogOption(
+                onPressed: () {
+                  _getImage(context,index,'gallerie');
+                },
+                child: const Text('la gallerie'),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  _getImage(context,index,'camera');
+                },
+                child: const Text('la camera'),
+              ),
+
+            ],
+          );
+        });
+  }
+  
+  _hello(){
+    print('Wait a bit');
   }
 
   @override
@@ -439,7 +496,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
         color: Colors.white,
         child:Container(
           width: width/1.1,
-          height: height/3,
+          height: height/5.7,
           alignment: Alignment.center,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
           padding: EdgeInsets.only(top: 15,bottom: 15),
@@ -451,103 +508,75 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
                 children: <Widget>[
 
                   Container(
-                    width: width/4.5,
+                    width: width/4.2,
                     height: height/8,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
                     padding: EdgeInsets.all(2),
                     child:GestureDetector(
-                      child: Image.asset(
-                          'assets/images/foret.jpeg',
-                          width: width/4.5,
-                          height: height/8,
-                          fit: BoxFit.cover
-                      ),
+                      child: _imageList.length == 0? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
+                          :
+                            Image.file(
+                                _imageList[0],
+                                width: width/4.5,
+                                height: height/8,
+                                fit: BoxFit.cover
+                            ),
+                      onTap: (){
+                        _dialog(context,0);
+                      },
                     )
                   ),
 
-                  SizedBox(width: 25),
+                  SizedBox(width: 22),
 
                   Container(
-                      width: width/4.5,
+                      width: width/4.2,
                       height: height/8,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
                       padding: EdgeInsets.all(2),
                       child:GestureDetector(
-                        child: Icon(Icons.add_circle,size: 25,color: Colors.pink,),
+                        child: _imageList.length < 2? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
+                            :
+                            Image.file(
+                                _imageList[1],
+                                width: width/4.5,
+                                height: height/8,
+                                fit: BoxFit.cover
+                            ),
+                        onTap: (){
+                          _dialog(context,1);
+                        },
                       )
                   ),
 
-                  SizedBox(width: 25),
+                  SizedBox(width: 22),
 
                   Container(
-                      width: width/4.5,
+                      width: width/4.2,
                       height: height/8,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
                       padding: EdgeInsets.all(2),
                       child:GestureDetector(
-                        child: Image.asset(
-                            'assets/images/mer.jpeg',
+                        child: _imageList.length < 3? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
+                            :
+                        Image.file(
+                            _imageList[2],
                             width: width/4.5,
                             height: height/8,
                             fit: BoxFit.cover
                         ),
+                        onTap: (){
+                          _dialog(context,2);
+                        },
                       )
                   )
 
                 ],
               ),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-
-                  Container(
-                      width: width/4.5,
-                      height: height/8,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
-                      padding: EdgeInsets.all(2),
-                      child:GestureDetector(
-                        child: Icon(Icons.add_circle,size: 25,color: Colors.pink,),
-                      )
-                  ),
-
-                  SizedBox(width: 25),
-
-                  Container(
-                      width: width/4.5,
-                      height: height/8,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
-                      padding: EdgeInsets.all(2),
-                      child:GestureDetector(
-                        child: Image.asset(
-                            'assets/images/jardin.jpeg',
-                            width: width/4.5,
-                            height: height/8,
-                            fit: BoxFit.cover
-                        ),
-                      )
-                  ),
-
-                  SizedBox(width: 25),
-
-                  Container(
-                      width: width/4.5,
-                      height: height/8,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
-                      padding: EdgeInsets.all(2),
-                      child:GestureDetector(
-                        child: Icon(Icons.add_circle,size: 25,color: Colors.pink,),
-                      )
-                  )
-
-                ],
-              ),
             ],
           ),
       ),
@@ -572,7 +601,6 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
           ],
         )
     );
-
 
     final rewardAmount =  new Container(
         width: width/1.8,
@@ -609,7 +637,6 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
             },
           )
     );
-
 
     final currentcyList =  new Container(
         width: width/3,
@@ -668,7 +695,16 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ResumeAnnounce()
+              builder: (context) => PreviewAnnounce(
+                town: _townName == 'Autre...'?_otherTownController.text: _townName,
+                date: _dateController.text,
+                contact: _phoneController.text,
+                objectName: _objectName == 'Autre...'?_otherObjectController.text: _objectName,
+                quarter: _quarterController.text,
+                description: _descriptionController.text,
+                rewardAmount: _rewardController.text + ' '+ _currentcy,
+                images: _imageList.length > 3 ? _imageList.take(3).toList() : _imageList,
+              )
           ),
         );
 
@@ -757,9 +793,9 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
                           SizedBox(height: 10.0),
                           AmountTitle,
                           SizedBox(height: 15.0),
-                          _imageList.length != 0
+                          _imageList.length == 0
                               ?
-                          Text('Veuillez remplir le formulaire en entier.',textAlign: TextAlign.center,style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500,fontFamily: 'Raleway'),)
+                          Text('Veuillez remplir le formulaire en entier.',textAlign: TextAlign.center,style: TextStyle(fontSize: 16,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),)
                               :
                           postAnnounceButton,
                           SizedBox(height: 25.0),
@@ -779,7 +815,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
             currentIndex: _selectedIndex,
             selectedItemColor: Colors.deepPurple,
             unselectedItemColor: Colors.black54,
-            onTap: onItemTapped,
+            onTap: _onItemTapped,
           ),
         ),
         onWillPop: null

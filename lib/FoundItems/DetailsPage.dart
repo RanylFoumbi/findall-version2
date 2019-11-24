@@ -3,6 +3,7 @@ import 'package:findall/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_swiper/flutter_swiper.dart';
 
@@ -34,10 +35,10 @@ class DetailFoundPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  DetailFoundPageState createState() => DetailFoundPageState();
+  _DetailFoundPageState createState() => _DetailFoundPageState();
 }
 
-class DetailFoundPageState extends State<DetailFoundPage> {
+class _DetailFoundPageState extends State<DetailFoundPage> {
 
   bool _showGetObject = false;
 
@@ -412,7 +413,7 @@ class DetailFoundPageState extends State<DetailFoundPage> {
               child: IconButton(
                   color: Colors.white,
                   iconSize: 40,
-                  icon: Icon(Icons.sms,
+                  icon: Icon(FontAwesomeIcons.sms,
                     color: Colors.deepPurple,
                     size: 32,
                   ),
