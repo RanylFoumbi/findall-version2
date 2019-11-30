@@ -149,7 +149,7 @@ class _NewFoundFormState extends State<NewFoundForm> {
               iconSize: 40,
               style: TextStyle(fontWeight: FontWeight.w700,color: Colors.black,fontFamily: 'Raleway',fontSize: 13),
               hint:  _objectName == null ?
-              Text(_objectName = "Carte national d'identité")
+              Text(_objectName = "Carte nationale d'identité")
                   :
               Text(_objectName),
               onChanged: (String changedValue) {
@@ -159,7 +159,7 @@ class _NewFoundFormState extends State<NewFoundForm> {
                 });
               },
               value: _objectName,
-              items: <String>[ 'Actes de naissance',"Carte national d'identité", 'Dilplômes', 'Passe port','Relevé de note','Téléphone portable','Autre...' ]
+              items: <String>[ 'Actes de naissance',"Carte nationale d'identité", 'Dilplômes','Ordinateur', 'Passeport','Porte-feuille','Relevé de note','Sac à dos','Sac à main','Télévision','Téléphone portable','Autre...' ]
                   .map((String value) {
                 return new DropdownMenuItem<String>(
                   value: value,
@@ -511,128 +511,148 @@ class _NewFoundFormState extends State<NewFoundForm> {
 
     final postAnnounceButton = !_isLoading
         ?
-    FloatingActionButton.extended(
-      icon: Icon(Icons.public),
-      label: Text('PUBLISH',style: TextStyle(fontFamily: 'Raleway'),),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10)
-      ),
-      backgroundColor: Colors.pink,
-      heroTag: "publish",
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => PreviewNewFound(
-                town: _townName == 'Autre...'?_otherTownController.text: _townName,
-                date: _dateController.text,
-                contact: _phoneController.text,
-                foundBy: _finderNameController.text,
-                objectName: _objectName == 'Autre...'?_otherObjectController.text: _objectName,
-                quarter: _quarterController.text,
-                description: _descriptionController.text,
-                images: ['assets/images/foret.jpeg','assets/images/mer.jpeg','assets/images/jardin.jpeg'],
-              )
-          ),
-        );
+            FloatingActionButton.extended(
+              icon: Icon(Icons.public),
+              label: Text('PUBLISH',style: TextStyle(fontFamily: 'Raleway'),),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)
+              ),
+              backgroundColor: Colors.pink,
+              heroTag: "publish",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PreviewNewFound(
+                        town: _townName == 'Autre...'?_otherTownController.text: _townName,
+                        date: _dateController.text,
+                        contact: _phoneController.text,
+                        foundBy: _finderNameController.text,
+                        objectName: _objectName == 'Autre...'?_otherObjectController.text: _objectName,
+                        quarter: _quarterController.text,
+                        description: _descriptionController.text,
+                        images: ['assets/images/foret.jpeg','assets/images/mer.jpeg','assets/images/jardin.jpeg'],
+                      )
+                  ),
+                );
 
-      },
-    )
+              },
+            )
         :
-    Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        SpinKitWave(color: Colors.deepPurple,size: 30),
-      ],
-    );
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                SpinKitWave(color: Colors.deepPurple,size: 30),
+              ],
+            );
+
+
+
 
     return WillPopScope(
         child: Scaffold(
           appBar: null,
-          body: Column(
-            children: <Widget>[
+          body:SizedBox.expand(
+            child:DraggableScrollableSheet(
+              initialChildSize: 1,
+              expand: false,
+              minChildSize: 1,
+              builder: (context,scrollController){
+                return SingleChildScrollView(physics: ScrollPhysics(),
+                  controller: scrollController,
+                  scrollDirection: Axis.vertical,
+                  padding: EdgeInsets.only(top: 50),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    verticalDirection: VerticalDirection.down,
+                    children: <Widget>[
 
-              SizedBox(height: 50),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          SizedBox(width: 5),
+                          Text('New Item found',textAlign: TextAlign.center,style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700,fontFamily: 'Raleway')),
 
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(width: 5),
-                  Text('New Item found',textAlign: TextAlign.center,style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700,fontFamily: 'Raleway')),
-                ],
-              ),
+                        ],
+                      ),
 
+                      SizedBox(height: 20.0),
 
-              Expanded(
-                  child: Builder(
-                    builder: (context) =>Form(
-                        key: _formKey,
-                        autovalidate: false,
-                        child: ListView(
-                          scrollDirection: Axis.vertical,
-                          padding: EdgeInsets.only(left: 15,right: 15),
-                          children: <Widget>[
-                            SizedBox(height: 10.0),
-                            datePicker,
-                            SizedBox(height: 10.0),
-                            dateTitle,
-                            SizedBox(height: 10.0),
-                            objectNames,
-                            SizedBox(height: 10.0),
-                            objectTitle,
-                            _objectName == 'Autre...'
-                                ?
-                            SizedBox(height: 10.0)
-                                :
-                            SizedBox(height: 0.0),
-                            _objectName == 'Autre...'
-                                ?
-                            otherObject
-                                :
-                            SizedBox(height: 0.0),
+                      Flexible(
+                          child: Builder(
+                            builder: (context) =>Form(
+                                key: _formKey,
+                                autovalidate: false,
+                                child: ListView(
+                                  primary: false,
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  padding: EdgeInsets.only(left: 15,right: 15),
+                                  children: <Widget>[
+                                    datePicker,
+                                    SizedBox(height: 7.0),
+                                    dateTitle,
+                                    SizedBox(height: 12.0),
+                                    objectNames,
+                                    SizedBox(height: 7.0),
+                                    objectTitle,
+                                    _objectName == 'Autre...'
+                                        ?
+                                    SizedBox(height: 12.0)
+                                        :
+                                    SizedBox(height: 0.0),
+                                    _objectName == 'Autre...'
+                                        ?
+                                    otherObject
+                                        :
+                                    SizedBox(height: 0.0),
 
-                            SizedBox(height: 10.0),
-                            town,
-                            SizedBox(height: 10.0),
-                            townTitle,
-                            _townName == 'Autre...'
-                                ?
-                            SizedBox(height: 10.0)
-                                :
-                            SizedBox(height: 0.0),
-                            _townName == 'Autre...'
-                                ?
-                            otherTown
-                                :
-                            SizedBox(height: 0.0),
-                            SizedBox(height: 10.0),
-                            quarter,
-                            SizedBox(height: 10.0),
-                            description,
-                            SizedBox(height: 10.0),
-                            camera,
-                            SizedBox(height: 10.0),
-                            phone,
-                            SizedBox(height: 10.0),
-                            phoneTitle,
-                            SizedBox(height: 10.0),
-                            finderName,
-                            SizedBox(height: 15.0),
-                            _imageList.length != 0
-                                ?
-                            Text('Veuillez remplir le formulaire en entier.',textAlign: TextAlign.center,style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500,fontFamily: 'Raleway'),)
-                                :
-                            postAnnounceButton,
-                            SizedBox(height: 25.0),
+                                    SizedBox(height: 12.0),
+                                    town,
+                                    SizedBox(height: 7.0),
+                                    townTitle,
+                                    _townName == 'Autre...'
+                                        ?
+                                    SizedBox(height: 12.0)
+                                        :
+                                    SizedBox(height: 0.0),
+                                    _townName == 'Autre...'
+                                        ?
+                                    otherTown
+                                        :
+                                    SizedBox(height: 0.0),
+                                    SizedBox(height: 12.0),
+                                    quarter,
+                                    SizedBox(height: 12.0),
+                                    description,
+                                    SizedBox(height: 12.0),
+                                    camera,
+                                    SizedBox(height: 12.0),
+                                    phone,
+                                    SizedBox(height: 7.0),
+                                    phoneTitle,
+                                    SizedBox(height: 12.0),
+                                    finderName,
+                                    SizedBox(height: 15.0),
+                                    _imageList.length != 0
+                                        ?
+                                    Text('Veuillez remplir le formulaire en entier.',textAlign: TextAlign.center,style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500,fontFamily: 'Raleway'),)
+                                        :
+                                    postAnnounceButton,
+                                    SizedBox(height: 25.0),
 
-                          ],
-                        )
-                    ),
-                  )
-              )
+                                  ],
+                                )
+                            ),
+                          )
+                      )
 
-            ],
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
         onWillPop: null

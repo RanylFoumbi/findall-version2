@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
         title: Text('Lost items',style: TextStyle(fontFamily: 'Raleway')),
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.public),
+        icon: Icon(Icons.add_circle_outline),
         title: Text('Post annou..',style: TextStyle(fontFamily: 'Raleway')),
       ),
       BottomNavigationBarItem(

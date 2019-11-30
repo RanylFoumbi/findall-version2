@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:findall/GlobalComponents/BoostResearch.dart';
+import 'package:findall/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_swiper/flutter_swiper.dart';
 
 
-class DetailLostPage extends StatefulWidget {
+class DetailFoundPage extends StatefulWidget {
 
   final int index;
   final String objectName;
@@ -19,10 +19,9 @@ class DetailLostPage extends StatefulWidget {
   final String contact;
   final List images;
   var profileImg;
-  final String postBy;
-  final String rewardAmount;
+  final String founderName;
 
-  DetailLostPage({Key key,
+  DetailFoundPage({Key key,
     this.index,
     this.objectName,
     this.description,
@@ -31,18 +30,24 @@ class DetailLostPage extends StatefulWidget {
     this.contact,
     this.images,
     this.profileImg,
-    this.postBy,
-    this.date,
-    this.rewardAmount
+    this.founderName,
+    this.date
   }) : super(key: key);
 
   @override
-  _DetailLostPageState createState() => _DetailLostPageState();
+  _DetailFoundPageState createState() => _DetailFoundPageState();
 }
 
-class _DetailLostPageState extends State<DetailLostPage> {
+class _DetailFoundPageState extends State<DetailFoundPage> {
+
+  bool _showGetObject = false;
 
 
+  showGetMyObject() {
+    setState(() {
+      _showGetObject = !_showGetObject;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +70,7 @@ class _DetailLostPageState extends State<DetailLostPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
-            Text('Post by' + ' ', style: TextStyle(color: Colors.grey,
+            Text('Found by' + ' ', style: TextStyle(color: Colors.grey,
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
                 fontFamily: 'Raleway'),
@@ -95,8 +100,7 @@ class _DetailLostPageState extends State<DetailLostPage> {
                 onTap: () {
                   photoView(context, widget.profileImg);
                 },
-              )
-              ,
+              ),
             ),
           ],
         ),
@@ -194,17 +198,18 @@ class _DetailLostPageState extends State<DetailLostPage> {
             fontWeight: FontWeight.bold,
             fontSize: 12,
             fontFamily: 'Raleway')
-        )
+         )
         ),
         SizedBox(width: width / 30),
         Container(
           child: Expanded(
               child: Text(widget.description, style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  fontFamily: 'Raleway')
-              )
+              color: Colors.black.withOpacity(0.6),
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+              fontFamily: 'Raleway'),
+                textAlign: TextAlign.justify,
+           )
           ),
         )
       ],
@@ -223,11 +228,11 @@ class _DetailLostPageState extends State<DetailLostPage> {
             ),
             SizedBox(width: width / 30),
             Expanded(child: Text(widget.town + ', ' + widget.quarter,
-                style: TextStyle(color: Colors.black,
+                style: TextStyle(color: Colors.black.withOpacity(0.6),
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                     fontFamily: 'Raleway')
-            )
+             )
             )
           ],
         )
@@ -244,29 +249,13 @@ class _DetailLostPageState extends State<DetailLostPage> {
                 fontFamily: 'Raleway')),
             SizedBox(width: width / 30),
             Expanded(child: Text(widget.date, style: TextStyle(
-                color: Colors.black,
+                color: Colors.black.withOpacity(0.6),
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
-                fontFamily: 'Raleway')))
-          ],
-        )
-    );
-
-    final reward = Container(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Text('Reward amount:', style: TextStyle(color: Colors.grey,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                fontFamily: 'Raleway')),
-            SizedBox(width: width / 30),
-            Expanded(child: Text(widget.rewardAmount, style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-                fontFamily: 'Raleway')))
+                fontFamily: 'Raleway'),
+              textAlign: TextAlign.justify,
+              )
+            )
           ],
         )
     );
@@ -280,7 +269,7 @@ class _DetailLostPageState extends State<DetailLostPage> {
                 color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12)),
             SizedBox(width: width / 30),
             Expanded(child: Text(widget.contact, style: TextStyle(
-                color: Colors.black,
+                color: Colors.black.withOpacity(0.6),
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
                 fontFamily: 'Raleway')))
@@ -296,11 +285,13 @@ class _DetailLostPageState extends State<DetailLostPage> {
             Text('By:', style: TextStyle(
                 color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12)),
             SizedBox(width: 20),
-            Expanded(child: Text(widget.postBy, style: TextStyle(
-                color: Colors.black,
+            Expanded(child: Text(widget.founderName, style: TextStyle(
+                color: Colors.black.withOpacity(0.6),
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
-                fontFamily: 'Raleway')))
+                fontFamily: 'Raleway')
+             )
+            )
           ],
         )
     );
@@ -325,8 +316,6 @@ class _DetailLostPageState extends State<DetailLostPage> {
           SizedBox(height: height / 35),
           date,
           SizedBox(height: height / 35),
-          reward,
-          SizedBox(height: height / 35),
           contact,
           SizedBox(height: height / 35),
           founderName
@@ -336,73 +325,111 @@ class _DetailLostPageState extends State<DetailLostPage> {
 
     final bottomButton = Row(
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
 
         Container(
-          height: 50,
-          width: width/2.6,
+          height: 53,
+          width: width / 1.15,
           decoration: BoxDecoration(
               border: Border.all(color: Colors.white),
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                    color: Color(0xffd4d4d3),
-                    blurRadius: 10.0, // has the effect of softening the shadow
-                    offset: Offset(2,7)
-                )
-              ]
           ),
           child: FloatingActionButton.extended(
-            icon: Icon(Icons.call,size: 27,color: Colors.white),
-            label: Text('Call'),
+            label: _showGetObject ?
+                Text('Please scroll down', style: TextStyle(
+                    color: Colors.white,fontWeight: FontWeight.bold, fontFamily: 'Raleway'),
+                )
+                :
+                Text('Get your item', style: TextStyle(
+                    color: Colors.white,fontWeight: FontWeight.bold, fontFamily: 'Raleway'),
+                ),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10)
             ),
             backgroundColor: Colors.pink,
-            heroTag: "call"+ widget.index.toString(),
-            onPressed: (){
-              UrlLauncher.launch('tel:'+ widget.contact);
+            heroTag: "get"+widget.index.toString(),
+            onPressed: () {
+              showGetMyObject();
             },
           ),
         ),
+      ],
+    );
 
-        Container(
-          height: 50,
-          width: width/2.6,
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.white),
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                    color: Color(0xffd4d4d3),
-                    blurRadius: 10.0, // has the effect of softening the shadow
-                    offset: Offset(2,7)
-                )
-              ]
-          ),
-          child: FloatingActionButton.extended(
-            icon: Icon(FontAwesomeIcons.buysellads,size: 27,color: Colors.deepPurple),
-            label: Text('Boost',
-                style: TextStyle(color: Colors.deepPurple)
-            ),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)
-            ),
-            backgroundColor: Colors.white,
-            heroTag: "boost"+ widget.index.toString(),
-            onPressed: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder:
-                        (context) => BoostResearchPage(index: widget.index)
-                ),
-              );
+    final getObject = Column(
+      children: <Widget>[
 
-            },
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+                child: Text('Connect with the person who has found your object.',style:
+                            TextStyle(fontFamily: 'Raleway',fontWeight: FontWeight.bold,fontSize: 15),
+                            textAlign: TextAlign.center,
+                   )
+            )
+          ],
         ),
+        SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+
+            new Container(
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(50),
+                  border: Border.all(color: Colors.white),
+                  color: Colors.white,
+                  boxShadow:[
+                    BoxShadow(
+                        color: Color(0xffd4d4d4),
+                        blurRadius: 10.0, // has the effect of softening the shadow
+                        offset: Offset(0,5)
+                    )
+                  ]
+              ),
+              child: IconButton(
+                  color: Colors.white,
+                  iconSize: 40,
+                  icon: Icon(Icons.call,
+                    color: Colors.deepPurple,
+                    size: 32,
+                  ),
+                  onPressed: (){
+                    UrlLauncher.launch('tel:'+ widget.contact);
+                  }
+              ),
+
+             ),
+
+            new Container(
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(50),
+                  border: Border.all(color: Colors.white),
+                  color: Colors.white,
+                  boxShadow:[
+                    BoxShadow(
+                        color: Color(0xffd4d4d4),
+                        blurRadius: 10.0, // has the effect of softening the shadow
+                        offset: Offset(0,5)
+                    )
+                  ]
+              ),
+              child: IconButton(
+                  color: Colors.white,
+                  iconSize: 40,
+                  icon: Icon(FontAwesomeIcons.sms,
+                    color: Colors.deepPurple,
+                    size: 32,
+                  ),
+                  onPressed: (){
+                    UrlLauncher.launch('sms:'+ widget.contact);
+                  }
+              ),
+
+            ),
+          ],
+        )
       ],
     );
 
@@ -423,6 +450,16 @@ class _DetailLostPageState extends State<DetailLostPage> {
               content,
               SizedBox(height: 20),
               bottomButton,
+              _showGetObject == true
+                  ?
+              SizedBox(height: 30.0)
+                  :
+              SizedBox(height: 0.0),
+              _showGetObject == true
+                  ?
+              getObject
+                  :
+              SizedBox(height: 0.0),
             ],
           ),
         ),
@@ -432,5 +469,5 @@ class _DetailLostPageState extends State<DetailLostPage> {
     );
   }
 
-}
+ }
 

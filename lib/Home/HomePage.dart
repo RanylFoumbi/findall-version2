@@ -108,7 +108,7 @@ class Home extends StatelessWidget {
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w400,
-                          fontSize: 33,
+                          fontSize: 29,
                           fontFamily:"Raleway"
                       ),
                     ),
@@ -121,7 +121,7 @@ class Home extends StatelessWidget {
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w400,
-                          fontSize: 33,
+                          fontSize: 29,
                           fontFamily:"Raleway"
                       ),
                     ),

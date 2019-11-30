@@ -1,11 +1,14 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:findall/Authentication/AuthPage.dart';
+import 'package:findall/Authentication/ProfilePage.dart';
 import 'package:findall/FakeData/FoundModel.dart';
 import 'package:findall/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/BottomNavigationItems.dart';
 import 'package:findall/GlobalComponents/SearchItems.dart';
+import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:findall/Home/HomePage.dart';
+import 'package:findall/LostItems/MyObjects.dart';
 import 'package:findall/LostItems/PostAnnounceForm.dart';
 import 'package:findall/LostItems/DetailPage.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +50,7 @@ class _LostItemsListState extends State<LostItemsList> {
             color: Colors.white,
             child: Container(
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 0.0),
+                  padding: const EdgeInsets.only(bottom: 3.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
@@ -109,7 +112,7 @@ class _LostItemsListState extends State<LostItemsList> {
                                     SizedBox(width: 5),
                                     Text('Ville:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
                                     SizedBox(width: 3),
-                                    Text(lostList[index].town,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13)),
+                                    Text(lostList[index].town,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13),overflow: TextOverflow.ellipsis),
                                   ]
                               ),
                             ),
@@ -125,7 +128,7 @@ class _LostItemsListState extends State<LostItemsList> {
                                     SizedBox(width: 5),
                                     Text('Quartier:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
                                     SizedBox(width: 3),
-                                    Text(lostList[index].quarter,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13)),
+                                    Text(lostList[index].quarter,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13),overflow: TextOverflow.ellipsis,),
                                   ]
                               ),
                             ),
@@ -141,7 +144,11 @@ class _LostItemsListState extends State<LostItemsList> {
                                     SizedBox(width: 5),
                                     Text('Reward Amount:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
                                     SizedBox(width: 3),
-                                    Text(lostList[index].rewardAmount,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13)),
+                                lostList[index].rewardAmount == 0
+                                    ?
+                                      Text("No reward",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13),overflow: TextOverflow.ellipsis,)
+                                    :
+                                      Text("Possible",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13),overflow: TextOverflow.ellipsis,),
                                   ]
                               ),
                             ),
@@ -158,12 +165,14 @@ class _LostItemsListState extends State<LostItemsList> {
             ),
           ),
           onTap: (){
+
             Navigator.push(
               context,
               MaterialPageRoute(
                   builder:
                       (context) => DetailLostPage (
                     index: index,
+                    context: context,
                     objectName:lostList[index].objectName,
                     description: lostList[index].description,
                     contact: lostList[index].phone,
@@ -226,7 +235,7 @@ class _LostItemsListState extends State<LostItemsList> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => PostAnnounceForm()
+              builder: (context) => MyObjects()
           ),
         );
       }
@@ -242,12 +251,27 @@ class _LostItemsListState extends State<LostItemsList> {
       break;
 
       case 5:{
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => AuthPage()
-          ),
-        );
+        userStorage.ready.then((_){
+
+          if(userStorage.getItem('userId') == null){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AuthPage()
+              ),
+            );
+          }else{
+            var userId = userStorage.getItem('userId');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                    userId: userId,
+                  )
+              ),
+            );
+          }
+        });
       }
       break;
     }
@@ -257,35 +281,51 @@ class _LostItemsListState extends State<LostItemsList> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+
     return WillPopScope(
       child: Scaffold(
-        body:Column(
-          children: <Widget>[
-            SizedBox(height: 50),
+        body:SizedBox.expand(
+            child:DraggableScrollableSheet(
+              initialChildSize: 1,
+              expand: false,
+              minChildSize: 1,
+              builder: (context,scrollController){
+                return SingleChildScrollView(physics: ScrollPhysics(),
+                  controller: scrollController,
+                  scrollDirection: Axis.vertical,
+                  padding: EdgeInsets.only(top: 50),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    verticalDirection: VerticalDirection.down,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          SizedBox(width: 5),
+                          Text('Lost objects',textAlign: TextAlign.left,style: TextStyle(fontWeight: FontWeight.w700,fontSize: 25,fontFamily: 'Raleway')),
+                        ],
+                      ),
 
-            Row(
-              children: <Widget>[
-                SizedBox(width: 5),
-                Text('Lost objects',textAlign: TextAlign.left,style: TextStyle(fontWeight: FontWeight.w700,fontSize: 25,fontFamily: 'Raleway')),
-              ],
-            ),
+                      Row(
+                        children: <Widget>[
+                          SizedBox(width: 5),
+                          Text('About (4) objects',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 13,fontFamily: 'Raleway')),
+                        ],
+                      ),
 
-            Row(
-              children: <Widget>[
-                SizedBox(width: 5),
-                Text('About (4) objects',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 13,fontFamily: 'Raleway')),
-              ],
-            ),
-
-            Flexible(
-              fit: FlexFit.tight,
-              child: ListView.builder(
-                itemBuilder: _buildLostItem,
-                scrollDirection: Axis.vertical,
-                itemCount: lostList.length,
-              ),
-            )
-          ],
+                      Flexible(
+                        child: ListView.builder(
+                          primary: false,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemBuilder: _buildLostItem,
+                          itemCount: lostList.length,
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              },
+         ),
         ),
         bottomNavigationBar: BottomNavigationBar(
           showUnselectedLabels: false,

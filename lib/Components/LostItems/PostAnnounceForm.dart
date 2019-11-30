@@ -4,6 +4,8 @@ import 'dart:io';
 import 'dart:io';
 import 'dart:io';
 
+import 'package:findall/Authentication/ProfilePage.dart';
+import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:findall/LostItems/PreviewAnnouncePage.dart';
 import 'package:findall/Authentication/AuthPage.dart';
 import 'package:findall/FoundItems/FoundedItemsList.dart';
@@ -36,11 +38,10 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
   var _dateController = TextEditingController();
   bool _isLoadingImg = false;
   bool _isLoading = false;
-  List _imageList = [];
+  List _imageList = [0,0,0];
   String _objectName;
   String _townName;
   String _currentcy;
-  var _image;
 
   int _selectedIndex = 3;
 
@@ -48,6 +49,9 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    setState(() {
+      _phoneController.text = phoneNumberStorage.getItem('userphone');
+    });
   }
 
   @override
@@ -113,12 +117,27 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
       break;
 
       case 5:{
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => AuthPage()
-          ),
-        );
+        userStorage.ready.then((_){
+
+          if(userStorage.getItem('userId') == null){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AuthPage()
+              ),
+            );
+          }else{
+            var userId = userStorage.getItem('userId');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                    userId: userId,
+                  )
+              ),
+            );
+          }
+        });
       }
       break;
     }
@@ -133,46 +152,59 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
     });
     if(option == 'camera'){
       var photo = await ImagePicker.pickImage(source: ImageSource.camera);
-      if(photo == null){
+      if(photo.lengthSync() == 0){
         Toast.show("Vous devez télécharger au moins une image avant de publier.", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
       }
-       setState(() {
-         picture = photo;
-       });
+      if(photo.runtimeType != Null){
+        setState(() {
+          picture = photo;
+          _imageList[index] = picture;
+        });
+      }else{
+
+      }
     }
     else{
       var photo = await ImagePicker.pickImage(source: ImageSource.gallery);
-      if(photo == null){
+      if(photo.lengthSync() == 0){
         Toast.show("Vous devez télécharger au moins une image avant de publier.", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
       }
-      setState(() {
-        picture = photo;
-      });
-    }
+      if(photo.runtimeType != Null){
+        setState(() {
+          picture = photo;
+          _imageList[index] = picture;
+        });
+      }else{
 
-    if(_imageList.isEmpty){
-      setState(() {
-        _imageList.add(picture);
-        _isLoadingImg = false;
-      });
+      }
     }
-    else {
-       if(index < _imageList.length){
-         setState(() {
-           _imageList.add(new File('assets/images/map.png'));
-           _imageList[index] = picture;
-           _imageList.remove(new File('assets/images/map.png'));
-         });
-       }
-       else{
-         setState(() {
-           _imageList.add(_imageList[index - 1]);
-           _imageList[index] = picture;
-         });
-       }
+  }
 
-    }
+  bool _isValidForm() {
+    return _descriptionController.text.length > 0 &&
+          _phoneController.text.length > 0 &&
+          _rewardController.text.length > 0 &&
+          _dateController.text.length > 0 &&
+          _imageList.length > 0;
+   }
 
+  _submit(){
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => PreviewAnnounce(
+            town: _townName == 'Autre...'?_otherTownController.text: _townName,
+            date: _dateController.text,
+            contact: _phoneController.text,
+            objectName: _objectName == 'Autre...'?_otherObjectController.text: _objectName,
+            quarter: _quarterController.text,
+            description: _descriptionController.text,
+            rewardAmount: _rewardController.text + ' '+ _currentcy,
+            images: _imageList,
+          )
+      ),
+    );
   }
 
   Future _dialog(BuildContext context,index) async {
@@ -199,10 +231,6 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
             ],
           );
         });
-  }
-  
-  _hello(){
-    print('Wait a bit');
   }
 
   @override
@@ -284,7 +312,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
               iconSize: 40,
               style: TextStyle(fontWeight: FontWeight.w700,color: Colors.black,fontFamily: 'Raleway',fontSize: 13),
               hint:  _objectName == null ?
-              Text(_objectName = "Carte national d'identité")
+              Text(_objectName = "Carte nationale d'identité")
                   :
               Text(_objectName),
               onChanged: (String changedValue) {
@@ -294,7 +322,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
                 });
               },
               value: _objectName,
-              items: <String>[ 'Actes de naissance',"Carte national d'identité", 'Dilplômes', 'Passe port','Relevé de note','Téléphone portable','Autre...' ]
+              items: <String>[ 'Actes de naissance',"Carte nationale d'identité", 'Dilplômes','Ordinateur', 'Passeport','Porte-feuille','Relevé de note','Sac à dos','Sac à main','Télévision','Téléphone portable','Autre...' ]
                   .map((String value) {
                 return new DropdownMenuItem<String>(
                   value: value,
@@ -419,27 +447,27 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
     );
 
     final description = TextFormField(
-      controller: _descriptionController,
-      keyboardType: TextInputType.multiline,
-      autocorrect: true,
-      maxLines: 5,
-      autofocus: false,
-      validator: (String value){
-        if(value.isEmpty ){
-          return "Ce champ ne peut pas être vide";
-        } else {
-          return null;
-        }
-      },
-      decoration: InputDecoration(
-          hintText: "Entrez une petite description de l'objet ...**",
-          hintStyle: TextStyle(fontSize: 13,fontStyle: FontStyle.italic,fontFamily: 'Raleway'),
-          alignLabelWithHint: true,
-          contentPadding: EdgeInsets.only(top: 10,right: 3, left: 10, bottom: 2),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0),borderSide: BorderSide(color: Color(0xffdcdcdc),))
-      ),
-    );
+              controller: _descriptionController,
+              keyboardType: TextInputType.multiline,
+              autocorrect: true,
+              maxLines: 5,
+              autofocus: false,
+              validator: (String value){
+                if(value.isEmpty ){
+                  return "Ce champ ne peut pas être vide";
+                } else {
+                  return null;
+                }
+              },
+              decoration: InputDecoration(
+                  hintText: "Entrez une petite description de l'objet ...**",
+                  hintStyle: TextStyle(fontSize: 13,fontStyle: FontStyle.italic,fontFamily: 'Raleway'),
+                  alignLabelWithHint: true,
+                  contentPadding: EdgeInsets.only(top: 10,right: 3, left: 10, bottom: 2),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0),borderSide: BorderSide(color: Color(0xffdcdcdc),))
+              ),
+          );
 
     final phoneTitle =  new Container(
         width: width/1.15,
@@ -461,129 +489,129 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
     );
 
     final phone =  TextFormField(
-     controller: _phoneController,
-     keyboardType: TextInputType.phone,
-     decoration: InputDecoration(
-       filled: true,
-       fillColor: Colors.white,
-       hintText: "phone Number",
-       hintStyle: TextStyle(
-         fontSize: 13.0,
-           fontFamily: 'Raleway'
-       ),
-       enabledBorder: OutlineInputBorder(
-           borderSide: const BorderSide(color: Color(0xffdcdcdc)),
-           borderRadius: BorderRadius.circular(10.0)),
-       border: OutlineInputBorder(
-         borderRadius: BorderRadius.circular(10.0),
-       ),
-       prefixIcon: Icon(
-         Icons.phone,
-         color: Color(0xfff4f4f4),
-       ),
-     ),
-     validator: (String value) {
-       if(value.isEmpty) {
-         return "Entrer un numéro de téléphone";
-       }
-       else if(value.length <= 4) {
-         return "Entrer un numéro de téléphone valide";
-       }
-     },
-   );
+                   controller: _phoneController,
+                   keyboardType: TextInputType.phone,
+                   decoration: InputDecoration(
+                     filled: true,
+                     fillColor: Colors.white,
+                     hintText: "phone Number",
+                     hintStyle: TextStyle(
+                       fontSize: 13.0,
+                         fontFamily: 'Raleway'
+                     ),
+                     enabledBorder: OutlineInputBorder(
+                         borderSide: const BorderSide(color: Color(0xffdcdcdc)),
+                         borderRadius: BorderRadius.circular(10.0)),
+                     border: OutlineInputBorder(
+                       borderRadius: BorderRadius.circular(10.0),
+                     ),
+                     prefixIcon: Icon(
+                       Icons.phone,
+                       color: Color(0xfff4f4f4),
+                     ),
+                   ),
+                   validator: (String value) {
+                     if(value.isEmpty) {
+                       return "Entrer un numéro de téléphone";
+                     }
+                     else if(value.length <= 4) {
+                       return "Entrer un numéro de téléphone valide";
+                     }
+                   },
+                 );
 
     final camera =  Card(
-        color: Colors.white,
-        child:Container(
-          width: width/1.1,
-          height: height/5.7,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-          padding: EdgeInsets.only(top: 15,bottom: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            color: Colors.white,
+            child:Container(
+              width: width/1.1,
+              height: height/5.7,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+              padding: EdgeInsets.only(top: 15,bottom: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
 
-                  Container(
-                    width: width/4.2,
-                    height: height/8,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
-                    padding: EdgeInsets.all(2),
-                    child:GestureDetector(
-                      child: _imageList.length == 0? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
-                          :
-                            Image.file(
-                                _imageList[0],
-                                width: width/4.5,
-                                height: height/8,
-                                fit: BoxFit.cover
-                            ),
-                      onTap: (){
-                        _dialog(context,0);
-                      },
-                    )
-                  ),
+                      Container(
+                        width: width/4.2,
+                        height: height/8,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
+                        padding: EdgeInsets.all(2),
+                        child:GestureDetector(
+                          child: _imageList[0].runtimeType == int ? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
+                              :
+                                Image.file(
+                                    _imageList[0],
+                                    width: width/4.5,
+                                    height: height/8,
+                                    fit: BoxFit.cover
+                                ),
+                          onTap: (){
+                            _dialog(context,0);
+                          },
+                        )
+                      ),
 
-                  SizedBox(width: 22),
+                      SizedBox(width: 22),
 
-                  Container(
-                      width: width/4.2,
-                      height: height/8,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
-                      padding: EdgeInsets.all(2),
-                      child:GestureDetector(
-                        child: _imageList.length < 2? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
-                            :
-                            Image.file(
-                                _imageList[1],
-                                width: width/4.5,
-                                height: height/8,
-                                fit: BoxFit.cover
-                            ),
-                        onTap: (){
-                          _dialog(context,1);
-                        },
+                      Container(
+                          width: width/4.2,
+                          height: height/8,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
+                          padding: EdgeInsets.all(2),
+                          child:GestureDetector(
+                            child: _imageList[1].runtimeType == int ? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
+                                :
+                                  Image.file(
+                                      _imageList[1],
+                                      width: width/4.5,
+                                      height: height/8,
+                                      fit: BoxFit.cover
+                                  ),
+                            onTap: (){
+                              _dialog(context,1);
+                            },
+                          )
+                      ),
+
+                      SizedBox(width: 22),
+
+                      Container(
+                          width: width/4.2,
+                          height: height/8,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
+                          padding: EdgeInsets.all(2),
+                          child:GestureDetector(
+                            child: _imageList[2].runtimeType == int ? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
+                                :
+                                  Image.file(
+                                      _imageList[2],
+                                      width: width/4.5,
+                                      height: height/8,
+                                      fit: BoxFit.cover
+                                  ),
+                            onTap: (){
+                              _dialog(context,2);
+                            },
+                          )
                       )
+
+                    ],
                   ),
-
-                  SizedBox(width: 22),
-
-                  Container(
-                      width: width/4.2,
-                      height: height/8,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
-                      padding: EdgeInsets.all(2),
-                      child:GestureDetector(
-                        child: _imageList.length < 3? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
-                            :
-                        Image.file(
-                            _imageList[2],
-                            width: width/4.5,
-                            height: height/8,
-                            fit: BoxFit.cover
-                        ),
-                        onTap: (){
-                          _dialog(context,2);
-                        },
-                      )
-                  )
 
                 ],
               ),
-
-            ],
           ),
-      ),
 
-    );
+        );
 
-    final AmountTitle =  new Container(
+    final amountTitle =  new Container(
         width: width/1.15,
         padding: EdgeInsets.only(left: 6.5,right: 6.5),
         child: Row(
@@ -611,7 +639,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
-              hintText: "Amount",
+              hintText: "amount",
               hintStyle: TextStyle(
                 fontSize: 13.0,
                 fontFamily: 'Raleway'
@@ -629,10 +657,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
             ),
             validator: (String value) {
               if(value.isEmpty) {
-                return "Entrer un numéro de téléphone";
-              }
-              else if(value.length <= 4) {
-                return "Entrer un numéro de téléphone valide";
+                return "Entrer un montant";
               }
             },
           )
@@ -662,7 +687,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
                 });
               },
               value: _currentcy,
-              items: <String>[ 'EUR',"USD", 'XAF']
+              items: <String>[ 'EUR',"USD", 'F CFA']
                   .map((String value) {
                 return new DropdownMenuItem<String>(
                   value: value,
@@ -685,29 +710,24 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
         ?
     FloatingActionButton.extended(
       icon: Icon(Icons.public),
-      label: Text('POST ANNOUNCEMENT',style: TextStyle(fontFamily: 'Raleway'),),
+      label: Text('POST ANNOUNCEMENT',style: TextStyle(fontFamily: 'Raleway'),
+        ),
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10)
       ),
       backgroundColor: Colors.pink,
       heroTag: "post",
       onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => PreviewAnnounce(
-                town: _townName == 'Autre...'?_otherTownController.text: _townName,
-                date: _dateController.text,
-                contact: _phoneController.text,
-                objectName: _objectName == 'Autre...'?_otherObjectController.text: _objectName,
-                quarter: _quarterController.text,
-                description: _descriptionController.text,
-                rewardAmount: _rewardController.text + ' '+ _currentcy,
-                images: _imageList.length > 3 ? _imageList.take(3).toList() : _imageList,
-              )
-          ),
-        );
-
+        _formKey.currentState.validate();
+          if (_isValidForm()) {
+            _submit();
+          } else {
+            _dateController.text.length == 0
+                ?
+                  Toast.show("Please pick the date.", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM)
+                :
+                  Toast.show("Fill the whole form.", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
+          }
         },
     )
         :
@@ -718,95 +738,112 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
       ],
     );
 
+
+
     return WillPopScope(
         child: Scaffold(
           appBar: null,
-          body: Column(
-            children: <Widget>[
+          body: SizedBox.expand(
+            child:DraggableScrollableSheet(
+              initialChildSize: 1,
+              expand: false,
+              minChildSize: 1,
+              builder: (context,scrollController){
+                return SingleChildScrollView(physics: ScrollPhysics(),
+                  controller: scrollController,
+                  scrollDirection: Axis.vertical,
+                  padding: EdgeInsets.only(top: 50),
+                  child: Column(
+                    children: <Widget>[
 
-              SizedBox(height: 50),
-
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(width: 5),
-                  Text('Post Announcement',textAlign: TextAlign.center,style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700,fontFamily: 'Raleway')),
-                ],
-              ),
-
-
-              Expanded(
-                child: Builder(
-                    builder: (context) =>Form(
-                      key: _formKey,
-                      autovalidate: false,
-                      child: ListView(
-                        scrollDirection: Axis.vertical,
-                        padding: EdgeInsets.only(left: 15,right: 15),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          SizedBox(height: 10.0),
-                          datePicker,
-                          SizedBox(height: 10.0),
-                          dateTitle,
-                          SizedBox(height: 10.0),
-                          objectNames,
-                          SizedBox(height: 10.0),
-                          objectTitle,
-                          _objectName == 'Autre...'
-                              ?
-                          SizedBox(height: 10.0)
-                              :
-                          SizedBox(height: 0.0),
-                          _objectName == 'Autre...'
-                              ?
-                          otherObject
-                              :
-                          SizedBox(height: 0.0),
+                          SizedBox(width: 5),
+                          Text('Post Announcement',textAlign: TextAlign.center,style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700,fontFamily: 'Raleway')),
+                        ],
+                      ),
 
-                          SizedBox(height: 10.0),
-                          town,
-                          SizedBox(height: 10.0),
-                          townTitle,
-                          _townName == 'Autre...'
-                              ?
-                          SizedBox(height: 10.0)
-                              :
-                          SizedBox(height: 0.0),
-                          _townName == 'Autre...'
-                              ?
-                          otherTown
-                              :
-                          SizedBox(height: 0.0),
-                          SizedBox(height: 10.0),
-                          quarter,
-                          SizedBox(height: 10.0),
-                          description,
-                          SizedBox(height: 10.0),
-                          camera,
-                          SizedBox(height: 10.0),
-                          phone,
-                          SizedBox(height: 10.0),
-                          phoneTitle,
-                          SizedBox(height: 10.0),
-                          rewardData,
-                          SizedBox(height: 10.0),
-                          AmountTitle,
-                          SizedBox(height: 15.0),
-                          _imageList.length == 0
-                              ?
-                          Text('Veuillez remplir le formulaire en entier.',textAlign: TextAlign.center,style: TextStyle(fontSize: 16,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),)
-                              :
-                          postAnnounceButton,
-                          SizedBox(height: 25.0),
+                      SizedBox(height: 20),
+
+                      Flexible(
+                          child: Builder(
+                            builder: (context) =>Form(
+                                key: _formKey,
+                                autovalidate: false,
+                                child: ListView(
+                                  primary: false,
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  scrollDirection: Axis.vertical,
+                                  padding: EdgeInsets.only(left: 15,right: 15),
+                                  children: <Widget>[
+                                    datePicker,
+                                    SizedBox(height: 7.0),
+                                    dateTitle,
+                                    SizedBox(height: 12.0),
+                                    objectNames,
+                                    SizedBox(height: 7.0),
+                                    objectTitle,
+                                    _objectName == 'Autre...'
+                                        ?
+                                    SizedBox(height: 12.0)
+                                        :
+                                    SizedBox(height: 0.0),
+                                    _objectName == 'Autre...'
+                                        ?
+                                    otherObject
+                                        :
+                                    SizedBox(height: 0.0),
+
+                                    SizedBox(height: 12.0),
+                                    town,
+                                    SizedBox(height: 7.0),
+                                    townTitle,
+                                    _townName == 'Autre...'
+                                        ?
+                                    SizedBox(height: 12.0)
+                                        :
+                                    SizedBox(height: 0.0),
+                                    _townName == 'Autre...'
+                                        ?
+                                    otherTown
+                                        :
+                                    SizedBox(height: 0.0),
+                                    SizedBox(height: 12.0),
+                                    quarter,
+                                    SizedBox(height: 12.0),
+                                    description,
+                                    SizedBox(height: 12.0),
+                                    camera,
+                                    SizedBox(height: 10.0),
+                                    phone,
+                                    SizedBox(height: 7.0),
+                                    phoneTitle,
+                                    SizedBox(height: 12.0),
+                                    rewardData,
+                                    SizedBox(height: 7.0),
+                                    amountTitle,
+                                    SizedBox(height: 15.0),
+                                    _imageList.length == 0
+                                        ?
+                                    Text('Veuillez remplir le formulaire en entier.',textAlign: TextAlign.center,style: TextStyle(fontSize: 16,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),)
+                                        :
+                                    postAnnounceButton,
+                                    SizedBox(height: 25.0),
+
+                                  ],
+                                )
+                            ),
+                          )
+                      )
 
                     ],
-                  )
                   ),
-                )
-              )
-
-            ],
+                );
+              },
+            ),
           ),
           bottomNavigationBar: BottomNavigationBar(
             showUnselectedLabels: false,

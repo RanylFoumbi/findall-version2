@@ -17,8 +17,7 @@ class _PopupState extends State<Popup> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return
-      SimpleDialog(
+    return SimpleDialog(
         backgroundColor: Colors.white,
         shape: OutlineInputBorder(borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Color(0xffdcdcdc))),
         contentPadding: EdgeInsets.only(left: 25,top: 25,right: 15,bottom: 25),

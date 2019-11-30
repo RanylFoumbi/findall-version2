@@ -1,10 +1,14 @@
-
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:findall/Authentication/AuthPage.dart';
+import 'package:findall/FakeData/FoundModel.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
 
-class PreviewNewFound extends StatefulWidget {
+class PreviewAnnounce extends StatefulWidget {
+
 
   final String objectName;
   final String description;
@@ -12,26 +16,26 @@ class PreviewNewFound extends StatefulWidget {
   final String quarter;
   final String date;
   final String contact;
-  final String foundBy;
+  final String rewardAmount;
   final List images;
 
-  PreviewNewFound({Key key,
+  PreviewAnnounce({Key key,
     this.objectName,
     this.description,
     this.town,
     this.quarter,
     this.contact,
     this.images,
-    this.foundBy,
-    this.date
+    this.date,
+    this.rewardAmount
   }) : super(key: key);
 
-
   @override
-  _PreviewNewFoundState createState() => _PreviewNewFoundState();
+  _PreviewAnnounceState createState() => _PreviewAnnounceState();
 }
 
-class _PreviewNewFoundState extends State<PreviewNewFound> {
+class _PreviewAnnounceState extends State<PreviewAnnounce> {
+
 
   @override
   void initState() {
@@ -53,11 +57,11 @@ class _PreviewNewFoundState extends State<PreviewNewFound> {
 
     return WillPopScope(
       child: Scaffold(
-          body: Container(
-            alignment: Alignment.center,
-              padding: EdgeInsets.only(left: 10, right: 10,top: 15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+          body: Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 0.0),
+                child:  Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
 
                     SizedBox(height: 50),
@@ -68,7 +72,7 @@ class _PreviewNewFoundState extends State<PreviewNewFound> {
                       children: <Widget>[
                         SizedBox(width: 5),
                         Expanded(
-                            child: Text('Preview of your Post',textAlign: TextAlign.center,style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700,fontFamily: 'Raleway'))
+                            child: Text('Preview of your Announcement',textAlign: TextAlign.center,style: TextStyle(fontSize: 25,fontWeight: FontWeight.w700,fontFamily: 'Raleway'))
                         ),
 
                         SizedBox(height: 50),
@@ -82,49 +86,49 @@ class _PreviewNewFoundState extends State<PreviewNewFound> {
                         children: <Widget>[
 
                           Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffeaeff2), width: 0.5),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Color(0xffd4d4d4),
-                                        blurRadius: 10.0, // has the effect of softening the shadow
-                                        offset: Offset(0, 4)
-                                    )
-                                  ]
-                              ),
-                              width: width,
-                              height: height / 2,
-                                child: new Swiper(
-                                  itemWidth: height / 1.8,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return GestureDetector(
-                                      child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(0),
-                                          child: Image.asset(
-                                              widget.images[index],
-                                              width: width/1.1,
-                                              height: height/2.7,
-                                              fit: BoxFit.cover
-                                          ),
-                                      ),
-                                      onTap: () {
-                                        photoView(context, widget.images[index]);
-                                      },
-                                    );
-                                  },
-                                  itemCount: widget.images.length,
-                                  autoplay: true,
-                                  pagination: new SwiperPagination(margin: EdgeInsets.all(0),),
-                                  control: new SwiperControl(
-                                    padding: EdgeInsets.all(0),
-                                    color: Colors.deepPurple,
-                                    size: 0,
-                                    iconPrevious: null,
-                                    iconNext: null,
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Color(0xffeaeff2), width: 0.5),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Color(0xffd4d4d4),
+                                      blurRadius: 10.0, // has the effect of softening the shadow
+                                      offset: Offset(0, 4)
+                                  )
+                                ]
+                            ),
+                            width: width,
+                            height: height / 2,
+                            child: new Swiper(
+                              itemWidth: height / 1.8,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(0),
+                                    child: Image.file(
+                                        widget.images[index],
+                                        width: width/1.1,
+                                        height: height/2.7,
+                                        fit: BoxFit.cover
+                                    ),
                                   ),
-                                ),
-                        ),
+                                  onTap: () {
+                                    photoView(context, widget.images[index]);
+                                  },
+                                );
+                              },
+                              itemCount: widget.images.length,
+                              autoplay: true,
+                              pagination: new SwiperPagination(margin: EdgeInsets.all(0),),
+                              control: new SwiperControl(
+                                padding: EdgeInsets.all(0),
+                                color: Colors.deepPurple,
+                                size: 0,
+                                iconPrevious: null,
+                                iconNext: null,
+                              ),
+                            ),
+                          ),
 
                           SizedBox(height: 15 ),
 
@@ -144,7 +148,7 @@ class _PreviewNewFoundState extends State<PreviewNewFound> {
                             children: <Widget>[
                               Icon(Icons.date_range, color: Colors.pink, size: 15),
                               SizedBox(width: 5),
-                              Text('Found the:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
+                              Text('Lost the:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
                               SizedBox(width: 5 ),
                               Expanded(
                                   child: Text(widget.date, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway'))
@@ -153,14 +157,13 @@ class _PreviewNewFoundState extends State<PreviewNewFound> {
                           ),
 
                           SizedBox(height: 8 ),
-
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Icon(Icons.location_city, color: Colors.pink, size: 15),
                               SizedBox(width: 5),
-                              Text('Found at:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
+                              Text('Lost at:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
                               SizedBox(width: 5 ),
                               Expanded(
                                   child: Text(widget.town, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway'))
@@ -168,23 +171,21 @@ class _PreviewNewFoundState extends State<PreviewNewFound> {
                             ],
                           ),
 
-
                           SizedBox(height: 8 ),
 
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Icon(Icons.account_circle, color: Colors.pink, size: 15),
+                              Icon(Icons.monetization_on, color: Colors.pink, size: 15),
                               SizedBox(width: 5),
-                              Text('Found by:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
+                              Text('Deal offer:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
                               SizedBox(width: 5 ),
                               Expanded(
-                                  child: Text(widget.foundBy, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway'))
+                                  child: Text(widget.rewardAmount, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway'))
                               )
                             ],
                           ),
-
 
                           SizedBox(height: 8 ),
 
@@ -202,7 +203,6 @@ class _PreviewNewFoundState extends State<PreviewNewFound> {
                             ],
                           ),
 
-
                           SizedBox(height: 8 ),
 
                           Row(
@@ -213,6 +213,7 @@ class _PreviewNewFoundState extends State<PreviewNewFound> {
                               SizedBox(width: 5),
                               Text('Description:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
                               SizedBox(width: 5 ),
+                              SizedBox(width: 5),
                               Expanded(
                                 child: Text(widget.description,style: TextStyle(fontSize: 15,fontFamily: 'Raleway')),
                               ),
@@ -251,7 +252,7 @@ class _PreviewNewFoundState extends State<PreviewNewFound> {
                                   height: 40,
                                   width: 100,
                                   child:FloatingActionButton.extended(
-                                    icon: Icon(Icons.public,color: Colors.white,),
+                                    icon: Icon(Icons.public,color: Colors.white),
                                     label: Text('Publish',
                                       style: TextStyle(
                                           fontFamily: 'Raleway'
@@ -261,15 +262,15 @@ class _PreviewNewFoundState extends State<PreviewNewFound> {
                                         borderRadius: BorderRadius.circular(10)
                                     ),
                                     backgroundColor: Colors.pink,
-                                    heroTag: "publish",
+                                    heroTag: "proceed",
                                     onPressed: (){
-                                      /*Navigator.push(
+                                      Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => AuthPage()
                                         ),
 
-                                      );*/
+                                      );
                                     },
                                   )
                               )
@@ -281,7 +282,8 @@ class _PreviewNewFoundState extends State<PreviewNewFound> {
                     ),
 
                   ],
-                ),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                ),)
           )
 
       ),

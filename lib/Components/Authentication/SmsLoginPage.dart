@@ -1,20 +1,11 @@
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:findall/Authentication/ProfilePage.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-/*
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toast/toast.dart';
-import 'package:country_code_picker/country_code_picker.dart';
-import 'package:findall/view/Found/CreateNewFoundPage.dart';
-import 'package:localstorage/localstorage.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:findall/view/Home/Home.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:findall/utilities.dart';
-*/
 
-//final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class SMSLoginPage extends StatefulWidget {
   @override
@@ -23,7 +14,6 @@ class SMSLoginPage extends StatefulWidget {
 
 class _SMSLoginPageState extends State<SMSLoginPage> {
 
-//  LocalStorage storage = new LocalStorage('userphoneNumber');
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _numController = TextEditingController();
 
@@ -38,7 +28,33 @@ class _SMSLoginPageState extends State<SMSLoginPage> {
     super.initState();
   }
 
-  /*Future<void> verifyPhone() async {
+
+  _redirect(user){
+    isToPostStorage.ready.then((_){
+      if(isToPostStorage.getItem('isTopost') == null){
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context)=> ProfilePage(
+                  userId: user.providerData[0].uid,
+                  email: null,
+                  phoneNumber: user.providerData[0].phoneNumber,
+                  profileImg: null,
+                  username: null,
+                  isPhoneAuth: true,
+                )
+            )
+        );
+      }else{
+
+      }
+    }).catchError((err){
+      print(err);
+    });
+  }
+
+
+  Future<void> verifyPhone() async {
     setState(() {
       _loading = true;
     });
@@ -76,7 +92,7 @@ class _SMSLoginPageState extends State<SMSLoginPage> {
         _loading = true;
       });
       await FirebaseAuth.instance.verifyPhoneNumber(
-          phoneNumber: numController.text,
+          phoneNumber: _numController.text,
           codeAutoRetrievalTimeout: autoRetrieve,
           codeSent: smsCodeSent,
           timeout: const Duration(seconds: 5),
@@ -90,14 +106,14 @@ class _SMSLoginPageState extends State<SMSLoginPage> {
     } catch (e) {
       print("Error");
       print(e);
-//      Toast.show("Erreur, Veuillez reésayer.", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
+      Toast.show("Erreur, Veuillez reésayer.", context, duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
     }
     setState(() {
       _loading = false;
     });
-  }*/
+  }
 
-  /*Future<bool> smsCodeDialog(BuildContext context) {
+  Future<bool> smsCodeDialog(BuildContext context) {
     return showDialog(
         context: context,
         barrierDismissible: false,
@@ -117,16 +133,10 @@ class _SMSLoginPageState extends State<SMSLoginPage> {
               RaisedButton(
                 onPressed: () {
                   FirebaseAuth.instance.currentUser().then((user) {
-                    signIn().then((user) {
-                      storage.setItem('userphoneNumber', numController.text);
+                    _signIn().then((user) {
+                      userStorage.setItem('userId', user.providerData[0].uid);
 
-                      Navigator.push(
-                          context,
-                          PageTransition(
-                              type: PageTransitionType.fade,
-                              child: CreateNewFound()
-                          )
-                      );
+                      _redirect(user);
 
                     }).catchError((err) {
                       Toast.show("Code Invalide", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
@@ -152,22 +162,16 @@ class _SMSLoginPageState extends State<SMSLoginPage> {
           );
         }
     );
-  }*/
+  }
 
-/*  Future<FirebaseUser> signIn() async {
-
+  Future<FirebaseUser> _signIn() async {
     final AuthCredential credential = PhoneAuthProvider.getCredential(
       verificationId: this.verificationId,
       smsCode: this.smsCode,
     );
-    final FirebaseUser user = await _auth.signInWithCredential(credential).then((user){
-      setState(() {
-        user = user;
-      });
-      print(user);
-    });
-    return user;
-  }*/
+    final AuthResult _auth = await auth.signInWithCredential(credential);
+    return _auth.user;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +235,7 @@ class _SMSLoginPageState extends State<SMSLoginPage> {
                         if(value.isEmpty) {
                           return "Entrer un numéro de téléphone";
                         }
-                        else if(value.length <= 4) {
+                        else if(value.length <= 5) {
                           return "Entrer un numéro de téléphone valide";
                         }
                       },
@@ -257,18 +261,16 @@ class _SMSLoginPageState extends State<SMSLoginPage> {
                                 if (await checkInternet() == true) {
                                   _formKey.currentState.validate();
 
-                                  /*verifyPhone().then((val) {
-
+                                  verifyPhone().then((val) {
+                                    phoneNumberStorage.setItem('userphone', _numController.text);
                                   })
-                                      .catchError((err) {
+                                   .catchError((err) {
                                     print(err);
-                               Toast.show("Numéro invalide", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
+                                     Toast.show("Numéro invalide", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
                                   });
                                 }
                                 else {
-                                  noInternet(context,
-                                      "Veuillez vérifier votre connexion internet, puis réessayez");
-                                }*/
+                                  noInternet(context, "Veuillez vérifier votre connexion internet, puis réessayez");
                                 }
                               }
                             )

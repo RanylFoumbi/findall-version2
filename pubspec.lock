@@ -92,6 +92,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.3"
+  firebase_auth:
+    dependency: "direct main"
+    description:
+      name: firebase_auth
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.15.0+1"
+  firebase_core:
+    dependency: transitive
+    description:
+      name: firebase_core
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.2"
+  firebase_core_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_core_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -104,6 +125,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.3"
+  flutter_facebook_login:
+    dependency: "direct main"
+    description:
+      name: flutter_facebook_login
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -144,6 +172,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "8.5.0"
+  google_sign_in:
+    dependency: "direct main"
+    description:
+      name: google_sign_in
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.14"
+  google_sign_in_platform_interface:
+    dependency: transitive
+    description:
+      name: google_sign_in_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   http:
     dependency: transitive
     description:
@@ -171,7 +213,7 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.1+11"
+    version: "0.6.2+1"
   intl:
     dependency: transitive
     description:
@@ -179,6 +221,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.15.8"
+  localstorage:
+    dependency: "direct main"
+    description:
+      name: localstorage
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.1+4"
   matcher:
     dependency: transitive
     description:
@@ -227,7 +276,7 @@ packages:
       name: photo_view
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.0"
+    version: "0.9.0"
   platform:
     dependency: transitive
     description:
@@ -242,6 +291,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.5"
+  quiver_hashcode:
+    dependency: transitive
+    description:
+      name: quiver_hashcode
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -368,4 +424,4 @@ packages:
     version: "2.2.0"
 sdks:
   dart: ">=2.5.0 <3.0.0"
-  flutter: ">=1.9.1+hotfix.4 <2.0.0"
+  flutter: ">=1.9.1+hotfix.5 <2.0.0"

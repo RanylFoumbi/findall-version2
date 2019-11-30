@@ -1,13 +1,32 @@
 import 'package:connectivity/connectivity.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:async/async.dart';
 
 
+final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
+final FirebaseAuth auth = FirebaseAuth.instance;
+final facebookLogin = FacebookLogin();
 const String OUR_CONTACT = "+237656801839";
 const String OUR_EMAIL = "ranylfoumbi@gmail.com";
+LocalStorage seen = LocalStorage('seen');
 
+  checkIfFirstSeen(index){
+    if(seen.getItem('seen$index').runtimeType == Null){
+      seen.setItem('seen$index','true');
+      return false;
+    }else if(seen.getItem('sen$index') == 'true'){
+
+    }else{
+      return true;
+    }
+  }
 
   Future<bool> checkInternet() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
@@ -18,7 +37,6 @@ const String OUR_EMAIL = "ranylfoumbi@gmail.com";
     }
     return false;
   }
-
 
   noInternet(context,msg){
 
@@ -62,13 +80,11 @@ const String OUR_EMAIL = "ranylfoumbi@gmail.com";
     );
   }
 
-
   verifyImageSource(image){
 
       if(image.runtimeType == String) return true;
-      else return false;
+        else return false;
   }
-
 
   photoView(context,image){
 

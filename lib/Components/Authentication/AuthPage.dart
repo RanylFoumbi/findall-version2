@@ -1,4 +1,6 @@
-import 'package:findall/LostItems/PostAnnounceForm.dart';
+import 'package:findall/Authentication/ProfilePage.dart';
+import 'package:findall/GlobalComponents/Utilities.dart';
+import 'package:findall/LostItems/MyObjects.dart';
 import 'package:findall/Authentication/SmsLoginPage.dart';
 import 'package:findall/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/BottomNavigationItems.dart';
@@ -7,6 +9,11 @@ import 'package:findall/Home/HomePage.dart';
 import 'package:findall/LostItems/LostItemsList.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+
 
 
 class AuthPage extends StatefulWidget{
@@ -18,6 +25,64 @@ class AuthPage extends StatefulWidget{
 
 class _AuthPageState extends State<AuthPage> {
   int _selectedIndex = 5;
+  bool _isLoggedIn = false;
+
+
+  Future<FirebaseUser> _signInWithGoogle() async {
+    final GoogleSignInAccount googleUser = await googleSignIn.signIn();
+    final GoogleSignInAuthentication googleAuth =
+    await googleUser.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    final AuthResult _auth = await auth.signInWithCredential(credential);
+    return _auth.user;
+  }
+
+  Future<FirebaseUser> _signInWithFacebook() async {
+    final result = await facebookLogin.logIn(['email', 'public_profile']);
+    if (result.status == FacebookLoginStatus.loggedIn) {
+      final AuthCredential credential = FacebookAuthProvider.getCredential(
+          accessToken: result.accessToken.token);
+      final AuthResult _auth = await auth.signInWithCredential(credential);
+      return _auth.user;
+    }
+  }
+
+  _redirect(user,authType){
+    /*if the previous screen was not a form to be submit,rediret to the profile page,
+    * else redirect to the lostobjectList page or to the foundObjectList page*/
+    isToPostStorage.ready.then((_) {
+      if (isToPostStorage.getItem('isTopost') == null) {
+       if(user != null){
+         Navigator.push(
+           context,
+           MaterialPageRoute(
+               builder:
+                   (context) => ProfilePage(
+                 userId: user.providerData[0].uid,
+                 email: authType == 'Google' ? user.providerData[0].email : null,
+                 phoneNumber: null,
+                 profileImg: user.providerData[0].photoUrl,
+                 username: user.providerData[0].displayName,
+                 isPhoneAuth: false,
+               )
+           ),
+         );
+       }else{
+
+         noInternet(context, "Veillez verifier votre connexion internet puis reessayer");
+       }
+      }else{
+
+
+      }
+    });
+  }
+
+
 
   onItemTapped(int index) {
     setState(() {
@@ -60,7 +125,7 @@ class _AuthPageState extends State<AuthPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => PostAnnounceForm()
+              builder: (context) => MyObjects()
           ),
         );
       }
@@ -76,12 +141,28 @@ class _AuthPageState extends State<AuthPage> {
       break;
 
       case 5:{
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => AuthPage()
-          ),
-        );
+        userStorage.ready.then((_){
+
+            if(userStorage.getItem('userId') == null){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AuthPage()
+                ),
+              );
+            }else{
+              var userId = userStorage.getItem('userId');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfilePage(
+                        userId: userId,
+                    ),
+                  )
+                );
+            }
+          });
+
       }
       break;
     }
@@ -126,7 +207,7 @@ class _AuthPageState extends State<AuthPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    'your messing item',
+                    'your missing item',
                     style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
@@ -183,8 +264,20 @@ class _AuthPageState extends State<AuthPage> {
                           heroTag: "google",
                           shape: OutlineInputBorder(borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Color(0xffea4335))),
                           icon: Icon(FontAwesomeIcons.google,color: Colors.white,size: 18),
-                          onPressed: null,
-                          label: Text("With Google",style: TextStyle(color: Colors.white,fontFamily: "Raleway"),)
+                          label: Text("With Google",style: TextStyle(color: Colors.white,fontFamily: "Raleway"),
+                          ),
+                          onPressed: (){
+                            _signInWithGoogle().then((user){
+                              print(user.providerData[0].runtimeType);
+
+                              userStorage.setItem('userId', user.providerData[0].uid);
+                              _redirect(user,'Google');
+                            }).catchError((err){
+                              noInternet(context, "Veillez verifier votre connexion internet puis reessayer");
+                              print(err);
+                            });
+
+                          },
                         )
                   ),
 
@@ -202,8 +295,17 @@ class _AuthPageState extends State<AuthPage> {
                           heroTag: "facebook",
                           shape: OutlineInputBorder(borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Color(0xff3b5998))),
                           icon: Icon(FontAwesomeIcons.facebookF,color: Colors.white,size: 18),
-                          onPressed: null,
-                          label: Text("With Facebook",style: TextStyle(color: Colors.white,fontFamily: "Raleway"),)
+                          label: Text("With Facebook",style: TextStyle(color: Colors.white,fontFamily: "Raleway"),
+                          ),
+                          onPressed: (){
+                              _signInWithFacebook().then((FirebaseUser user) {
+                                      userStorage.setItem('userId', user.providerData[0].uid);
+                                      _redirect(user,'Facebook');
+                              }).catchError((err){
+                                print(err);
+                              });
+
+                          },
                     )
                   ),
 
@@ -231,7 +333,5 @@ class _AuthPageState extends State<AuthPage> {
         }
     );
   }
-
-
 
 }

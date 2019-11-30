@@ -1,12 +1,15 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:findall/Authentication/AuthPage.dart';
+import 'package:findall/Authentication/ProfilePage.dart';
 import 'package:findall/FakeData/FoundModel.dart';
 import 'package:findall/FoundItems/DetailsPage.dart';
 import 'package:findall/GlobalComponents/BottomNavigationItems.dart';
 import 'package:findall/GlobalComponents/SearchItems.dart';
+import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:findall/Home/HomePage.dart';
 import 'package:findall/LostItems/LostItemsList.dart';
+import 'package:findall/LostItems/MyObjects.dart';
 import 'package:findall/LostItems/PostAnnounceForm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -48,7 +51,7 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
             color: Colors.white,
             child: Container(
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 0.0),
+                  padding: const EdgeInsets.only(bottom: 3.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
@@ -191,7 +194,6 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
 
   }
 
-
   onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -233,7 +235,7 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => PostAnnounceForm()
+              builder: (context) => MyObjects()
           ),
         );
       }
@@ -249,12 +251,27 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
       break;
 
       case 5:{
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => AuthPage()
-          ),
-        );
+        userStorage.ready.then((_){
+
+          if(userStorage.getItem('userId') == null){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AuthPage()
+              ),
+            );
+          }else{
+            var userId = userStorage.getItem('userId');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                    userId: userId,
+                  )
+              ),
+            );
+          }
+        });
       }
       break;
     }
@@ -264,42 +281,59 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+
 
     return WillPopScope(
       child: Scaffold(
-        body:Column(
-          children: <Widget>[
-            SizedBox(height: 50),
-            Row(
-              children: <Widget>[
-                SizedBox(width: 5),
-                Text('Found objects',textAlign: TextAlign.left,style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Raleway'
-                )
-                ),
-              ],
-            ),
-
-            Row(
-              children: <Widget>[
-                SizedBox(width: 5),
-                Text('About (4) objects',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 13,fontFamily: 'Raleway')),
-              ],
-            ),
-
-            Flexible(
-              child: ListView.builder(
-                itemBuilder: _buildFoundedItem,
+        body:SizedBox.expand(
+          child:DraggableScrollableSheet(
+            initialChildSize: 1,
+            expand: false,
+            minChildSize: 1,
+            builder: (context,scrollController){
+              return SingleChildScrollView(physics: ScrollPhysics(),
+                controller: scrollController,
                 scrollDirection: Axis.vertical,
-                itemCount: foundList.length,
-                key: Key(foundList.length.toString()),
-              ),
-            )
-          ],
+                padding: EdgeInsets.only(top: 50),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  verticalDirection: VerticalDirection.down,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        SizedBox(width: 5),
+                        Text('Found objects',textAlign: TextAlign.left,style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Raleway'
+                        )
+                        ),
+                      ],
+                    ),
+
+                    Row(
+                      children: <Widget>[
+                        SizedBox(width: 5),
+                        Text('About (4) objects',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 13,fontFamily: 'Raleway')),
+                      ],
+                    ),
+
+                    Flexible(
+                      child: ListView.builder(
+                        primary: false,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemBuilder: _buildFoundedItem,
+                        scrollDirection: Axis.vertical,
+                        itemCount: foundList.length,
+                        key: Key(foundList.length.toString()),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
         ),
         bottomNavigationBar: BottomNavigationBar(
           showUnselectedLabels: false,
