@@ -1,12 +1,13 @@
-import 'package:findall/Authentication/ProfilePage.dart';
+import 'package:findall/Components/Authentication/ProfilePage.dart';
+import 'package:findall/Components/Authentication/SmsLoginPage.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
-import 'package:findall/LostItems/MyObjects.dart';
-import 'package:findall/Authentication/SmsLoginPage.dart';
-import 'package:findall/FoundItems/FoundedItemsList.dart';
+import 'package:findall/Components/LostItems/MyObjects.dart';
+import 'package:findall/Components/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/BottomNavigationItems.dart';
 import 'package:findall/GlobalComponents/SearchItems.dart';
 import 'package:findall/Home/HomePage.dart';
-import 'package:findall/LostItems/LostItemsList.dart';
+import 'package:findall/Components/LostItems/LostItemsList.dart';
+import 'package:findall/Services/LostObjectService.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -25,7 +26,6 @@ class AuthPage extends StatefulWidget{
 
 class _AuthPageState extends State<AuthPage> {
   int _selectedIndex = 5;
-  bool _isLoggedIn = false;
 
 
   Future<FirebaseUser> _signInWithGoogle() async {
@@ -143,13 +143,13 @@ class _AuthPageState extends State<AuthPage> {
       case 5:{
         userStorage.ready.then((_){
 
-            if(userStorage.getItem('userId') == null){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AuthPage()
-                ),
-              );
+            if(!isLoggedIn()){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AuthPage()
+                  ),
+                );
             }else{
               var userId = userStorage.getItem('userId');
                 Navigator.push(

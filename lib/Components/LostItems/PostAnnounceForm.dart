@@ -1,18 +1,12 @@
-
-import 'dart:io';
-import 'dart:io';
-import 'dart:io';
-import 'dart:io';
-
-import 'package:findall/Authentication/ProfilePage.dart';
+import 'package:findall/Components/Authentication/ProfilePage.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
-import 'package:findall/LostItems/PreviewAnnouncePage.dart';
-import 'package:findall/Authentication/AuthPage.dart';
-import 'package:findall/FoundItems/FoundedItemsList.dart';
+import 'package:findall/Components/LostItems/PreviewAnnouncePage.dart';
+import 'package:findall/Components/Authentication/AuthPage.dart';
+import 'package:findall/Components/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/BottomNavigationItems.dart';
 import 'package:findall/GlobalComponents/SearchItems.dart';
 import 'package:findall/Home/HomePage.dart';
-import 'package:findall/LostItems/LostItemsList.dart';
+import 'package:findall/Components/LostItems/LostItemsList.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
@@ -119,7 +113,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
       case 5:{
         userStorage.ready.then((_){
 
-          if(userStorage.getItem('userId') == null){
+          if(!isLoggedIn()){
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -129,12 +123,12 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
           }else{
             var userId = userStorage.getItem('userId');
             Navigator.push(
-              context,
-              MaterialPageRoute(
+                context,
+                MaterialPageRoute(
                   builder: (context) => ProfilePage(
                     userId: userId,
-                  )
-              ),
+                  ),
+                )
             );
           }
         });

@@ -1,4 +1,4 @@
-import 'package:findall/FoundItems/FoundedItemsList.dart';
+import 'package:findall/Components/FoundItems/FoundedItemsList.dart';
 import 'package:flutter/material.dart';
 
 

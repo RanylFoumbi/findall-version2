@@ -13,18 +13,27 @@ import 'package:async/async.dart';
 final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
 final FirebaseAuth auth = FirebaseAuth.instance;
 final facebookLogin = FacebookLogin();
-const String OUR_CONTACT = "+237656801839";
-const String OUR_EMAIL = "ranylfoumbi@gmail.com";
-LocalStorage seen = LocalStorage('seen');
+final LocalStorage seen = LocalStorage('seen');
+final LocalStorage phoneNumberStorage =  LocalStorage('userphone');
+final LocalStorage userStorage =  LocalStorage('userId');
+final LocalStorage isToPostStorage =  LocalStorage('isTopost');
+final String ORANGE_MONEY = '+237 656 801 839';
 
-  checkIfFirstSeen(index){
+
+  bool checkIfFirstSeen(index){
     if(seen.getItem('seen$index').runtimeType == Null){
       seen.setItem('seen$index','true');
       return false;
-    }else if(seen.getItem('sen$index') == 'true'){
-
     }else{
       return true;
+    }
+  }
+
+  bool isLoggedIn(){
+    if(userStorage.getItem('userId') != null){
+      return true;
+    }else{
+      return false;
     }
   }
 

@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.add_circle_outline),
-        title: Text('Post annou..',style: TextStyle(fontFamily: 'Raleway')),
+        title: Text('Added objects',style: TextStyle(fontFamily: 'Raleway')),
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.search),

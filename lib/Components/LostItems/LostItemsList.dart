@@ -1,16 +1,15 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:findall/Authentication/AuthPage.dart';
-import 'package:findall/Authentication/ProfilePage.dart';
+import 'package:findall/Components/Authentication/AuthPage.dart';
+import 'package:findall/Components/Authentication/ProfilePage.dart';
 import 'package:findall/FakeData/FoundModel.dart';
-import 'package:findall/FoundItems/FoundedItemsList.dart';
+import 'package:findall/Components/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/BottomNavigationItems.dart';
 import 'package:findall/GlobalComponents/SearchItems.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:findall/Home/HomePage.dart';
-import 'package:findall/LostItems/MyObjects.dart';
-import 'package:findall/LostItems/PostAnnounceForm.dart';
-import 'package:findall/LostItems/DetailPage.dart';
+import 'package:findall/Components/LostItems/MyObjects.dart';
+import 'package:findall/Components/LostItems/DetailPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -253,7 +252,7 @@ class _LostItemsListState extends State<LostItemsList> {
       case 5:{
         userStorage.ready.then((_){
 
-          if(userStorage.getItem('userId') == null){
+          if(!isLoggedIn()){
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -263,12 +262,12 @@ class _LostItemsListState extends State<LostItemsList> {
           }else{
             var userId = userStorage.getItem('userId');
             Navigator.push(
-              context,
-              MaterialPageRoute(
+                context,
+                MaterialPageRoute(
                   builder: (context) => ProfilePage(
                     userId: userId,
-                  )
-              ),
+                  ),
+                )
             );
           }
         });

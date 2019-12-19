@@ -1,7 +1,5 @@
-import 'package:findall/GlobalComponents/Utilities.dart';
-import 'package:findall/LostItems/LostItemsList.dart';
+import 'package:findall/Components/LostItems/LostItemsList.dart';
 import 'package:flutter/material.dart';
-
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
@@ -20,12 +18,6 @@ class BoostResearchPage extends StatefulWidget{
 }
 
 class _BoostResearchPageState extends State<BoostResearchPage> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  var _nameController = TextEditingController();
-  var _emailController = TextEditingController();
-  var _messageController = TextEditingController();
-
-
 
   Future _thankYouDialog()async{
 

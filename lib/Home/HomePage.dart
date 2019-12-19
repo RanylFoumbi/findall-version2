@@ -1,8 +1,7 @@
-import 'package:findall/FoundItems/NewFoundForm.dart';
-import 'package:findall/LostItems/Popup.dart';
+import 'package:findall/Components/FoundItems/NewFoundForm.dart';
+import 'package:findall/Components/LostItems/Popup.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:findall/FoundItems/FoundedItemsList.dart';
 
 
 class HomePage extends StatelessWidget {
@@ -75,7 +74,6 @@ class Home extends StatelessWidget {
         children: <Widget>[
 
           Container(
-              margin: EdgeInsets.only(),
               child: RotatedBox(
                 quarterTurns: 0,
                 child: new Image.asset(
@@ -197,10 +195,7 @@ class Home extends StatelessWidget {
             ),
     ),
           Container(
-            margin: EdgeInsets.only(
-              left: width/2.5,
-              top: height/1.02,
-            ),
+            alignment: Alignment.bottomCenter,
             child: new Text('CopyRight@ranolf2019',
                 style: new TextStyle(
                     fontSize: 9.0,

@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:findall/Authentication/AuthPage.dart';
+import 'package:findall/Components/Authentication/AuthPage.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

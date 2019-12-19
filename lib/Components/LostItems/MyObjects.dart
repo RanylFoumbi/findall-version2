@@ -2,33 +2,34 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:findall/Components/Authentication/AuthPage.dart';
 import 'package:findall/Components/Authentication/ProfilePage.dart';
-import 'package:findall/Components/LostItems/LostItemsList.dart';
 import 'package:findall/FakeData/FoundModel.dart';
-import 'package:findall/Components/FoundItems/DetailsPage.dart';
+import 'package:findall/Components/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/BottomNavigationItems.dart';
 import 'package:findall/GlobalComponents/SearchItems.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:findall/Home/HomePage.dart';
-import 'package:findall/Components/LostItems/MyObjects.dart';
+import 'package:findall/Components/LostItems/LostItemsList.dart';
+import 'package:findall/Components/LostItems/PostAnnounceForm.dart';
+import 'package:findall/Components/LostItems/DetailPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 
-class FoundedItemsList extends StatefulWidget {
+class MyObjects extends StatefulWidget {
 
   @override
-  _FoundedItemsListState createState() => _FoundedItemsListState();
+  _MyObjectsState createState() => _MyObjectsState();
 }
 
-class _FoundedItemsListState extends State<FoundedItemsList> {
-  int _selectedIndex = 1;
-  List foundList;
+class _MyObjectsState extends State<MyObjects> {
+  int _selectedIndex = 3;
+  List lostList;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    foundList = Found().getFoundList();
+    lostList = Found().getFoundList();
   }
 
   @override
@@ -38,8 +39,7 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
   }
 
 
-  Widget _buildFoundedItem(BuildContext context, int index){
-
+  Widget _buildLostItem(BuildContext context, int index){
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
@@ -66,7 +66,7 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
                           height: height/4.2,
                           fit: BoxFit.cover,
                           repeat: ImageRepeat.noRepeat,
-                          imageUrl: foundList[index].imageUrl[0],
+                          imageUrl: lostList[index].imageUrl[0],
                           placeholder: (context, url) => new SpinKitWave(color: Colors.deepPurple,size: 30),
                           errorWidget: (context, url, error) => new Icon(Icons.error,color: Colors.deepPurple),
                         ),
@@ -84,13 +84,7 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
-                                Text(foundList[index].objectName, style: TextStyle(
-                                        fontFamily: 'Raleway',
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 20
-                                    ),
-                                      overflow: TextOverflow.ellipsis,textAlign: TextAlign.left,
-                                    )
+                                Text(lostList[index].objectName, style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),overflow: TextOverflow.ellipsis,textAlign: TextAlign.left),
                               ],
                             ),
 
@@ -102,12 +96,12 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
                                   children: <Widget>[
                                     Icon(Icons.date_range, color: Colors.pink, size: 15,),
                                     SizedBox(width: 5 ),
-                                    Text(foundList[index].date, style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway',), overflow: TextOverflow.ellipsis,)
+                                    Text(lostList[index].date, style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway'), overflow: TextOverflow.ellipsis)
                                   ],
                                 )
                             ),
 
-                            SizedBox(height: 2.5 ),
+                            SizedBox(height: 1.5 ),
 
                             Container(
                               height: 20,
@@ -118,12 +112,12 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
                                     SizedBox(width: 5),
                                     Text('Ville:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
                                     SizedBox(width: 3),
-                                    Text(foundList[index].town,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13)),
+                                    Text(lostList[index].town,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13),overflow: TextOverflow.ellipsis),
                                   ]
                               ),
                             ),
 
-                            SizedBox(height: 2.5 ),
+                            SizedBox(height: 1.5 ),
 
                             Container(
                               height: 20,
@@ -134,23 +128,27 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
                                     SizedBox(width: 5),
                                     Text('Quartier:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
                                     SizedBox(width: 3),
-                                    Text(foundList[index].quarter,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13)),
+                                    Text(lostList[index].quarter,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13),overflow: TextOverflow.ellipsis,),
                                   ]
                               ),
                             ),
 
-                            SizedBox(height: 2.5 ),
+                            SizedBox(height: 1.5 ),
 
                             Container(
                               height: 20,
                               width: width/2.2,
                               child: Row(
                                   children: <Widget>[
-                                    Icon(Icons.person, color: Colors.pink, size: 15),
+                                    Icon(Icons.monetization_on, color: Colors.pink, size: 15),
                                     SizedBox(width: 5),
-                                    Text('Post by:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
+                                    Text('Reward Amount:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
                                     SizedBox(width: 3),
-                                    Text(foundList[index].postBy,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13)),
+                                    lostList[index].rewardAmount == 0
+                                        ?
+                                    Text("No reward",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13),overflow: TextOverflow.ellipsis,)
+                                        :
+                                    Text("Possible",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13),overflow: TextOverflow.ellipsis,),
                                   ]
                               ),
                             ),
@@ -168,22 +166,23 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
           ),
           onTap: (){
 
-
             Navigator.push(
               context,
               MaterialPageRoute(
                   builder:
-                      (context) => DetailFoundPage (
+                      (context) => DetailLostPage (
                     index: index,
-                    objectName:foundList[index].objectName,
-                    description: foundList[index].description,
-                    contact: foundList[index].phone,
-                    founderName: foundList[index].foundBy,
-                    images: foundList[index].imageUrl,
-                    date: foundList[index].date,
-                    profileImg: foundList[index].profileImg,
-                    quarter: foundList[index].quarter,
-                    town: foundList[index].town,
+                    context: context,
+                    objectName:lostList[index].objectName,
+                    description: lostList[index].description,
+                    contact: lostList[index].phone,
+                    postBy: lostList[index].postBy,
+                    images: lostList[index].imageUrl,
+                    date: lostList[index].date,
+                    profileImg: lostList[index].profileImg,
+                    quarter: lostList[index].quarter,
+                    town: lostList[index].town,
+                    rewardAmount: lostList[index].rewardAmount,
                   )
               ),
             );
@@ -192,6 +191,8 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
     );
 
   }
+
+
 
   onItemTapped(int index) {
     setState(() {
@@ -281,7 +282,6 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
   Widget build(BuildContext context) {
     // TODO: implement build
 
-
     return WillPopScope(
       child: Scaffold(
         body:SizedBox.expand(
@@ -301,12 +301,7 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
                     Row(
                       children: <Widget>[
                         SizedBox(width: 5),
-                        Text('Found objects',textAlign: TextAlign.left,style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'Raleway'
-                        )
-                        ),
+                        Text('Added objects',textAlign: TextAlign.left,style: TextStyle(fontWeight: FontWeight.w700,fontSize: 25,fontFamily: 'Raleway')),
                       ],
                     ),
 
@@ -322,10 +317,8 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
                         primary: false,
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
-                        itemBuilder: _buildFoundedItem,
-                        scrollDirection: Axis.vertical,
-                        itemCount: foundList.length,
-                        key: Key(foundList.length.toString()),
+                        itemBuilder: _buildLostItem,
+                        itemCount: lostList.length,
                       ),
                     )
                   ],
@@ -333,6 +326,19 @@ class _FoundedItemsListState extends State<FoundedItemsList> {
               );
             },
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.deepPurple,
+          onPressed: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PostAnnounceForm()
+              ),
+            );
+          },
+          tooltip: 'Increment',
+          child: Icon(Icons.add),
         ),
         bottomNavigationBar: BottomNavigationBar(
           showUnselectedLabels: false,

@@ -1,6 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:findall/LostItems/Popup.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:findall/GlobalComponents/BoostResearch.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
@@ -8,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:localstorage/localstorage.dart';
 
 
 class DetailLostPage extends StatefulWidget {
