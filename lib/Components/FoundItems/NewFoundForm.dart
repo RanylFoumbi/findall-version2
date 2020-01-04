@@ -25,7 +25,6 @@ class _NewFoundFormState extends State<NewFoundForm> {
   List _imageList = [];
   String _objectName;
   String _townName;
-  var _image;
 
   @override
   void initState() {
@@ -531,7 +530,7 @@ class _NewFoundFormState extends State<NewFoundForm> {
                         objectName: _objectName == 'Autre...'?_otherObjectController.text: _objectName,
                         quarter: _quarterController.text,
                         description: _descriptionController.text,
-                        images: ['assets/images/foret.jpeg','assets/images/mer.jpeg','assets/images/jardin.jpeg'],
+                        images: ['assets/images/mer.jpeg','assets/images/jardin.jpeg'],
                       )
                   ),
                 );

@@ -11,15 +11,15 @@ import 'package:flutter/material.dart';
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.view_list),
-        title: Text('Found items',style: TextStyle(fontFamily: 'Raleway')),
+        title: Text('Found',style: TextStyle(fontFamily: 'Raleway')),
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.account_balance),
-        title: Text('Lost items',style: TextStyle(fontFamily: 'Raleway')),
+        title: Text('Lost',style: TextStyle(fontFamily: 'Raleway')),
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.add_circle_outline),
-        title: Text('Added objects',style: TextStyle(fontFamily: 'Raleway')),
+        title: Text('Added',style: TextStyle(fontFamily: 'Raleway')),
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.search),
@@ -27,7 +27,7 @@ import 'package:flutter/material.dart';
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.person),
-        title: Text('My account',style: TextStyle(fontFamily: 'Raleway')),
+        title: Text('Account',style: TextStyle(fontFamily: 'Raleway')),
       ),
     ];
   }

@@ -1,5 +1,6 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findall/Components/Authentication/AuthPage.dart';
 import 'package:findall/Components/Authentication/ProfilePage.dart';
 import 'package:findall/FakeData/FoundModel.dart';
@@ -11,6 +12,7 @@ import 'package:findall/Home/HomePage.dart';
 import 'package:findall/Components/LostItems/LostItemsList.dart';
 import 'package:findall/Components/LostItems/PostAnnounceForm.dart';
 import 'package:findall/Components/LostItems/DetailPage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -22,14 +24,93 @@ class MyObjects extends StatefulWidget {
 }
 
 class _MyObjectsState extends State<MyObjects> {
+  List<DocumentSnapshot> _lostList = []; // stores fetched products
+  List<DocumentSnapshot> _allData = []; // stores fetched products
+  FirebaseUser _user;
+  bool _isLoading = false; // track if products fetching
+  bool _hasMore = false; // flag for more products available or not
+  int _docPerPage = 3;
+  DocumentSnapshot _lastDocument; // flag for last document from where next 10 records to be fetched
   int _selectedIndex = 3;
-  List lostList;
 
   @override
   void initState() {
     // TODO: implement initState
+    setState(() {
+      _isLoading = true;
+    });
+    /*fetch current user data*/
+    getCurrentUser().then((user){
+      setState(() {
+        _user = user;
+      });
+      /*fetch all objects of the current user from FireStore*/
+      db.collection('foundObjectList').where('userId',isEqualTo: _user == null ? null : _user.providerData[0].uid.toString()).getDocuments().then((allData){
+        print(_user.providerData[0].uid);
+        if(allData.documents.length == 0){
+          setState(() {
+            _isLoading = false;
+          });
+        }else{
+          setState(() {
+            _allData = allData.documents;
+            _isLoading = false;
+          });
+          _getObjects();
+        }
+
+      }).catchError((err){
+        print(err);
+      });
+    }).catchError((err){
+      print(err);
+    });
+
+
     super.initState();
-    lostList = Found().getFoundList();
+
+  }
+
+  _getObjects() async{
+
+     if(_allData.length < _docPerPage){
+       setState(() {
+         _hasMore = false;
+         _lostList = _allData;
+       });
+     }else{
+       var _restDoc = _allData.length - _lostList.length;
+
+       print(_restDoc);
+       if(_restDoc >= _docPerPage){
+
+         _lostList.length == 0
+             ?
+               setState(() {
+                 _hasMore = true;
+                 _lostList.addAll(_allData.getRange(0, _docPerPage));
+                 _lastDocument = _lostList[_lostList.length - 1];
+               })
+             :
+               setState(() {
+                 _hasMore = true;
+                 _lostList.addAll(_allData.getRange(_lostList.lastIndexOf(_lastDocument) , (_lostList.length - 1) + _docPerPage ));
+                 _lastDocument = _lostList[_lostList.length - 1];
+               });
+
+       }else{
+         setState(() {
+           _lostList.addAll(_allData.sublist(_lostList.length));
+           _lastDocument = _lostList[_lostList.length - 1];
+           _hasMore = false;
+         });
+       }
+       if(_lostList.length == _allData.length){
+         setState(() {
+           _hasMore = false;
+         });
+       }
+     }
   }
 
   @override
@@ -38,6 +119,69 @@ class _MyObjectsState extends State<MyObjects> {
     super.dispose();
   }
 
+  /*Future _loggedDialog()async{
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    return await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context){
+          return SimpleDialog(
+            backgroundColor: Colors.white,
+            shape: OutlineInputBorder(borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Color(0xffdcdcdc))),
+            contentPadding: EdgeInsets.only(left: 12,top: 25,right: 12,bottom: 5),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: Text("You are not yet Logged.",style: TextStyle(fontWeight: FontWeight.w500,fontFamily: "Raleway",fontSize: 17),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+            children: <Widget>[
+
+              Column(
+                children: <Widget>[
+
+                  SizedBox(width: 15),
+
+                  Container(
+                    height: 45,
+                    width: width/3,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Colors.pink),
+                    child: FloatingActionButton.extended(
+                      label: Text('Login now',style: TextStyle(fontSize: 14.5
+                          ,color: Colors.white,fontFamily: 'Raleway',fontWeight: FontWeight.w700),
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)
+                      ),
+                      backgroundColor: Colors.pink,
+                      heroTag: "login",
+                      onPressed: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AuthPage()
+                          ),
+
+                        );
+                      },
+                    ),
+                  ),
+
+                  SizedBox(height: 25),
+                ],
+              )
+            ],
+          );
+        }
+    );
+
+
+  }*/
 
   Widget _buildLostItem(BuildContext context, int index){
     double width = MediaQuery.of(context).size.width;
@@ -46,153 +190,134 @@ class _MyObjectsState extends State<MyObjects> {
     return Container(
         key: Key(index.toString()),
         child: GestureDetector(
-          child: Card(
-            color: Colors.white,
-            child: Container(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Card(
+                      color: Colors.white,
+                      child: Container(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 3.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                    children: <Widget>[
-
-                      new Container(
-                        width: width/2.2,
-                        height: height/4.2,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.all(3.0),
-                        child:CachedNetworkImage(
-                          width: width/2.3,
-                          height: height/4.2,
-                          fit: BoxFit.cover,
-                          repeat: ImageRepeat.noRepeat,
-                          imageUrl: lostList[index].imageUrl[0],
-                          placeholder: (context, url) => new SpinKitWave(color: Colors.deepPurple,size: 30),
-                          errorWidget: (context, url, error) => new Icon(Icons.error,color: Colors.deepPurple),
-                        ),
-                      ),
-
-                      new Container(
-                        width: width/2,
-                        height: height/4.35,
-                        margin: EdgeInsets.only(left: 5),
-                        child: Column(
-                          children: <Widget>[
-
-                            SizedBox(height: 17 ),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
-                                Text(lostList[index].objectName, style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),overflow: TextOverflow.ellipsis,textAlign: TextAlign.left),
+
+                                new Container(
+                                  width: width/2.2,
+                                  height: height/4.2,
+                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                                  padding: const EdgeInsets.all(3.0),
+                                  child:CachedNetworkImage(
+                                    width: width/2.3,
+                                    height: height/4.2,
+                                    fit: BoxFit.cover,
+                                    repeat: ImageRepeat.noRepeat,
+                                    imageUrl: _lostList[index].data['images'][0],
+                                    placeholder: (context, url) => new SpinKitWave(color: Colors.deepPurple,size: 30),
+                                    errorWidget: (context, url, error) => new Icon(Icons.error,color: Colors.deepPurple),
+                                  ),
+                                ),
+
+
+                                new Container(
+                                  width: width/2,
+                                  margin: EdgeInsets.only(left: 5),
+                                  child: Column(
+                                    children: <Widget>[
+
+                                      SizedBox(height: 17 ),
+
+                                      Container(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(_lostList[index].data['objectName'], style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),overflow: TextOverflow.ellipsis,textAlign: TextAlign.left),
+                                      ),
+
+                                      SizedBox(height: 18 ),
+                                      Container(
+                                          height: 20,
+                                          width: width/2.2,
+                                          child: Row(
+                                            children: <Widget>[
+                                              Icon(Icons.date_range, color: Colors.pink, size: 15,),
+                                              SizedBox(width: 5 ),
+                                              Flexible(
+                                                  child: Text(_lostList[index].data['date'], style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway'), overflow: TextOverflow.ellipsis)
+                                              )
+                                            ],
+                                          )
+                                      ),
+
+                                      SizedBox(height: 1.6 ),
+
+                                      Container(
+                                        height: 20,
+                                        width: width/2.2,
+                                        child: Row(
+                                            children: <Widget>[
+                                              Icon(Icons.location_city, color: Colors.pink, size: 15),
+                                              SizedBox(width: 5),
+                                              Text('Ville:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
+                                              SizedBox(width: 3),
+                                              Flexible(
+                                                child:Text(_lostList[index].data['town'],style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13),overflow: TextOverflow.ellipsis),
+                                              )
+                                            ]
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 1.6 ),
+
+                                      Container(
+                                        height: 20,
+                                        width: width/2.2,
+                                        child: Row(
+                                            children: <Widget>[
+                                              Icon(Icons.monetization_on, color: Colors.pink, size: 15),
+                                              SizedBox(width: 5),
+                                              Text('Reward Amount:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
+                                              SizedBox(width: 3),
+                                              Flexible(
+                                                  child: Text(_lostList[index].data['rewardAmount'],style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13),overflow: TextOverflow.ellipsis,)
+                                              )
+                                            ]
+                                        ),
+                                      ),
+
+
+                                    ],
+                                  ),
+
+                                )
+
                               ],
                             ),
+                          )
+                      ),
+                    ),
+                    onTap: (){
 
-                            SizedBox(height: 18 ),
-                            Container(
-                                height: 20,
-                                width: width/2.2,
-                                child: Wrap(
-                                  children: <Widget>[
-                                    Icon(Icons.date_range, color: Colors.pink, size: 15,),
-                                    SizedBox(width: 5 ),
-                                    Text(lostList[index].date, style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway'), overflow: TextOverflow.ellipsis)
-                                  ],
-                                )
-                            ),
-
-                            SizedBox(height: 1.5 ),
-
-                            Container(
-                              height: 20,
-                              width: width/2.2,
-                              child: Row(
-                                  children: <Widget>[
-                                    Icon(Icons.location_city, color: Colors.pink, size: 15),
-                                    SizedBox(width: 5),
-                                    Text('Ville:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
-                                    SizedBox(width: 3),
-                                    Text(lostList[index].town,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13),overflow: TextOverflow.ellipsis),
-                                  ]
-                              ),
-                            ),
-
-                            SizedBox(height: 1.5 ),
-
-                            Container(
-                              height: 20,
-                              width: width/2.2,
-                              child: Row(
-                                  children: <Widget>[
-                                    Icon(Icons.my_location, color: Colors.pink, size: 15),
-                                    SizedBox(width: 5),
-                                    Text('Quartier:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
-                                    SizedBox(width: 3),
-                                    Text(lostList[index].quarter,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13),overflow: TextOverflow.ellipsis,),
-                                  ]
-                              ),
-                            ),
-
-                            SizedBox(height: 1.5 ),
-
-                            Container(
-                              height: 20,
-                              width: width/2.2,
-                              child: Row(
-                                  children: <Widget>[
-                                    Icon(Icons.monetization_on, color: Colors.pink, size: 15),
-                                    SizedBox(width: 5),
-                                    Text('Reward Amount:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
-                                    SizedBox(width: 3),
-                                    lostList[index].rewardAmount == 0
-                                        ?
-                                    Text("No reward",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13),overflow: TextOverflow.ellipsis,)
-                                        :
-                                    Text("Possible",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13),overflow: TextOverflow.ellipsis,),
-                                  ]
-                              ),
-                            ),
-
-
-                          ],
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder:
+                                (context) => DetailLostPage (
+                              index: index,
+                              context: context,
+                              objectName:_lostList[index].data['objectName'],
+                              description: _lostList[index].data['description'],
+                              contact: _lostList[index]['contact'],
+                              postBy: _lostList[index].data['userId'],
+                              images: _lostList[index].data['images'],
+                              date: _lostList[index].data['date'],
+                              profileImg: _user.providerData[0].photoUrl,
+                              quarter: _lostList[index].data['quarter'],
+                              town: _lostList[index].data['town'],
+                              rewardAmount: _lostList[index].data['rewardAmount'],
+                            )
                         ),
-
-                      )
-
-                    ],
-                  ),
-                )
-            ),
-          ),
-          onTap: (){
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder:
-                      (context) => DetailLostPage (
-                    index: index,
-                    context: context,
-                    objectName:lostList[index].objectName,
-                    description: lostList[index].description,
-                    contact: lostList[index].phone,
-                    postBy: lostList[index].postBy,
-                    images: lostList[index].imageUrl,
-                    date: lostList[index].date,
-                    profileImg: lostList[index].profileImg,
-                    quarter: lostList[index].quarter,
-                    town: lostList[index].town,
-                    rewardAmount: lostList[index].rewardAmount,
+                      );
+                    },
                   )
-              ),
-            );
-          },
-        )
-    );
-
+      );
   }
-
-
 
   onItemTapped(int index) {
     setState(() {
@@ -261,12 +386,12 @@ class _MyObjectsState extends State<MyObjects> {
               ),
             );
           }else{
-            var userId = userStorage.getItem('userId');
+            var userID = userStorage.getItem('userId');
             Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ProfilePage(
-                    userId: userId,
+                    userId: userID,
                   ),
                 )
             );
@@ -281,7 +406,6 @@ class _MyObjectsState extends State<MyObjects> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-
     return WillPopScope(
       child: Scaffold(
         body:SizedBox.expand(
@@ -290,7 +414,7 @@ class _MyObjectsState extends State<MyObjects> {
             expand: false,
             minChildSize: 1,
             builder: (context,scrollController){
-              return SingleChildScrollView(physics: ScrollPhysics(),
+              return SingleChildScrollView(
                 controller: scrollController,
                 scrollDirection: Axis.vertical,
                 padding: EdgeInsets.only(top: 50),
@@ -308,19 +432,104 @@ class _MyObjectsState extends State<MyObjects> {
                     Row(
                       children: <Widget>[
                         SizedBox(width: 5),
-                        Text('About (4) objects',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 13,fontFamily: 'Raleway')),
+                        Text('About ('+ _lostList.length.toString() +') objects',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 13,fontFamily: 'Raleway')),
                       ],
                     ),
 
                     Flexible(
-                      child: ListView.builder(
-                        primary: false,
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemBuilder: _buildLostItem,
-                        itemCount: lostList.length,
-                      ),
-                    )
+                      child: _isLoading == true
+                          ?
+                           _user == null
+                                       ?
+                           Container(
+                             alignment: Alignment.center,
+                             child: Column(
+                               crossAxisAlignment: CrossAxisAlignment.center,
+                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                               children: <Widget>[
+                                 Container(
+                                   padding: EdgeInsets.only(top: MediaQuery.of(context).size.height/6.5,bottom: 8),
+                                   alignment: Alignment.center,
+                                   child: Image.asset("assets/images/loginBefore.png",
+                                     alignment: Alignment.center,
+                                     fit: BoxFit.cover,
+                                     width: MediaQuery.of(context).size.width/2.2,
+                                     height: MediaQuery.of(context).size.width/2.2,
+                                   ),
+                                 ),
+
+                                 Text('You are not Login.',style: TextStyle(fontFamily: 'Raleway',fontSize: 15,fontWeight: FontWeight.w300),textAlign: TextAlign.center,),
+                                 SizedBox(height: 3),
+                                 FlatButton(
+                                     onPressed: (){
+                                       Navigator.push(
+                                         context,
+                                         MaterialPageRoute(
+                                             builder: (context) => AuthPage()
+                                         ),
+                                       );
+                                     },
+                                     child: Text('Login',style: TextStyle(color: Colors.deepPurple,fontSize: 14,fontFamily: 'Raleway',fontWeight: FontWeight.bold),)
+                                 ),
+
+                               ],
+                             ),
+                           )
+                                       :
+                                         Container(
+                                            height: MediaQuery.of(context).size.height/1.3,
+                                            alignment: Alignment.center,
+                                            child: SpinKitFadingCircle(color: Colors.deepPurple,
+                                              size: 65,
+                                            ),
+                                          )
+                                          :
+                                            _lostList.length == 0
+                                                                 ?
+                                                                    Container(
+                                                                      alignment: Alignment.center,
+                                                                      child: Column(
+                                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                        children: <Widget>[
+                                                                          Container(
+                                                                            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height/4,bottom: 8),
+                                                                            alignment: Alignment.center,
+                                                                            child: Image.asset("assets/images/noDataFound.png",
+                                                                              alignment: Alignment.center,
+                                                                              fit: BoxFit.cover,
+                                                                              width: MediaQuery.of(context).size.width/1.5,
+                                                                            ),
+                                                                          ),
+                                                                          
+                                                                          Text('No data found.',style: TextStyle(fontFamily: 'Raleway',fontSize: 15,fontWeight: FontWeight.w300),textAlign: TextAlign.center,)
+                                                                        ],
+                                                                      ),
+                                                                    )
+                                                                 :
+                                                                     ListView.builder(
+                                                                        primary: false,
+                                                                        shrinkWrap: true,
+                                                                        physics: NeverScrollableScrollPhysics(),
+                                                                        itemBuilder: _buildLostItem,
+                                                                        itemCount: _lostList.length,
+                                                                      ),
+
+                    ),
+
+                    _hasMore
+                        ?
+                          Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.all(3),
+                            child: FlatButton(
+                                shape: Border.all(color: Colors.black),
+                                onPressed: ()=>_getObjects(),
+                                child: Text('Load More.',style: TextStyle(color: Colors.black,fontSize: 12,fontFamily: 'Raleway'),)
+                            ),
+                          )
+                        :
+                          Container()
                   ],
                 ),
               );
@@ -330,12 +539,21 @@ class _MyObjectsState extends State<MyObjects> {
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.deepPurple,
           onPressed: (){
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => PostAnnounceForm()
-              ),
-            );
+            if(isLoggedIn() != true){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AuthPage()
+                ),
+              );
+            }else{
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => PostAnnounceForm()
+                ),
+              );
+            }
           },
           tooltip: 'Increment',
           child: Icon(Icons.add),
@@ -350,7 +568,7 @@ class _MyObjectsState extends State<MyObjects> {
           onTap: onItemTapped,
         ),
       ),
-      onWillPop: null,
+      onWillPop: (){},
     );
   }
 

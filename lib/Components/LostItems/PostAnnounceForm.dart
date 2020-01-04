@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:findall/Components/Authentication/ProfilePage.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:findall/Components/LostItems/PreviewAnnouncePage.dart';
@@ -28,14 +29,13 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
   var _quarterController = TextEditingController();
   var _descriptionController = TextEditingController();
   var _phoneController = TextEditingController();
-  var _rewardController = TextEditingController();
   var _dateController = TextEditingController();
   bool _isLoadingImg = false;
   bool _isLoading = false;
-  List _imageList = [0,0,0];
+  List _imageList = [];
   String _objectName;
   String _townName;
-  String _currentcy;
+  String _isRewarded;
 
   int _selectedIndex = 3;
 
@@ -121,12 +121,12 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
               ),
             );
           }else{
-            var userId = userStorage.getItem('userId');
+            var userID = userStorage.getItem('userId');
             Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ProfilePage(
-                    userId: userId,
+                    userId: userID,
                   ),
                 )
             );
@@ -138,35 +138,108 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
 
   }
 
-  _getImage(context,index,option) async{
+  _removeImage(image){
+    setState(() {
+      _imageList.remove(image);
+    });
+  }
+
+  Widget _buildImageListView() {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    return  ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: _imageList.length + 1,
+          itemBuilder: (BuildContext context, int index) {
+              return new Padding(
+                padding: EdgeInsets.only(left: 4,right: 2),
+                child: index < _imageList.length ?
+                          Container(
+                              width: width/4.5,
+                              height: height/8,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
+                              padding: EdgeInsets.all(2),
+                              child: Stack(
+                                children: <Widget>[
+                                  _imageList[index].runtimeType == String ?
+                                      Image.network(
+                                      _imageList[index],
+                                          width: width/4.5,
+                                          height: height/8,
+                                          fit: BoxFit.cover
+                                      )
+                                    :
+                                      Image.file(
+                                      _imageList[index],
+                                          width: width/4.5,
+                                          height: height/8,
+                                          fit: BoxFit.cover
+                                      ),
+
+                                  Positioned(
+                                    right: 0.0,
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        _removeImage(_imageList[index]);
+                                      },
+                                      child: Align(
+                                        alignment: Alignment.topRight,
+                                        child: CircleAvatar(
+                                          radius: 8.5,
+                                          backgroundColor: Colors.white,
+                                          child: Icon(Icons.close, color: Colors.red, size: 10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                          )
+
+                        :
+                          IconButton(
+                            padding: EdgeInsets.all(3.5),
+                            icon: Icon(Icons.add_circle,size: 40, color: _imageList.length == 3 ? Colors.white : Colors.pink),
+                            onPressed:() {
+                              _imageList.length == 3 ? null : _dialog(context);
+                            },
+                          ),
+              );
+
+          });
+
+  }
+
+  _getImage(context,option) async{
     var picture;
     Navigator.of(context).pop();
     setState(() {
       _isLoadingImg = true;
     });
     if(option == 'camera'){
-      var photo = await ImagePicker.pickImage(source: ImageSource.camera);
+      File photo = await ImagePicker.pickImage(source: ImageSource.camera);
       if(photo.lengthSync() == 0){
         Toast.show("Vous devez télécharger au moins une image avant de publier.", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
       }
       if(photo.runtimeType != Null){
         setState(() {
           picture = photo;
-          _imageList[index] = picture;
+          _imageList.add(picture);
         });
       }else{
 
       }
     }
     else{
-      var photo = await ImagePicker.pickImage(source: ImageSource.gallery);
+      File photo = await ImagePicker.pickImage(source: ImageSource.gallery);
       if(photo.lengthSync() == 0){
         Toast.show("Vous devez télécharger au moins une image avant de publier.", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
       }
       if(photo.runtimeType != Null){
         setState(() {
           picture = photo;
-          _imageList[index] = picture;
+          _imageList.add(picture);
         });
       }else{
 
@@ -177,12 +250,13 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
   bool _isValidForm() {
     return _descriptionController.text.length > 0 &&
           _phoneController.text.length > 0 &&
-          _rewardController.text.length > 0 &&
-          _dateController.text.length > 0 &&
-          _imageList.length > 0;
+          _dateController.text.length > 0;
    }
 
   _submit(){
+
+    print(_imageList[0]);
+    print(_imageList[0].runtimeType);
 
     Navigator.push(
       context,
@@ -194,14 +268,68 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
             objectName: _objectName == 'Autre...'?_otherObjectController.text: _objectName,
             quarter: _quarterController.text,
             description: _descriptionController.text,
-            rewardAmount: _rewardController.text + ' '+ _currentcy,
+            rewardAmount: _isRewarded,
             images: _imageList,
           )
       ),
     );
   }
 
-  Future _dialog(BuildContext context,index) async {
+  _setImageIfNotSelected(objectName){
+
+    switch (objectName) {
+      case 'Document':
+        {
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+        }
+        break;
+
+      case 'Ordinateur':
+        {
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+        }
+        break;
+
+      case 'Porte-feuille':
+        {
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+        }
+        break;
+
+      case 'Sac à dos':
+        {
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+        }
+        break;
+
+      case 'Sac à main':
+        {
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+        }
+        break;
+
+      case 'Télévision':
+        {
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+        }
+        break;
+
+      case 'Téléphone portable':
+        {
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+        }
+        break;
+
+      case 'Autre...':
+        {
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+        }
+        break;
+    }
+
+  }
+
+  Future _dialog(BuildContext context) async {
     return  showDialog(
         context: context,
         barrierDismissible: true,
@@ -211,13 +339,13 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
             children: <Widget>[
               SimpleDialogOption(
                 onPressed: () {
-                  _getImage(context,index,'gallerie');
+                  _getImage(context,'gallerie');
                 },
                 child: const Text('la gallerie'),
               ),
               SimpleDialogOption(
                 onPressed: () {
-                  _getImage(context,index,'camera');
+                  _getImage(context,'camera');
                 },
                 child: const Text('la camera'),
               ),
@@ -306,7 +434,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
               iconSize: 40,
               style: TextStyle(fontWeight: FontWeight.w700,color: Colors.black,fontFamily: 'Raleway',fontSize: 13),
               hint:  _objectName == null ?
-              Text(_objectName = "Carte nationale d'identité")
+              Text(_objectName = "Document",textAlign: TextAlign.center)
                   :
               Text(_objectName),
               onChanged: (String changedValue) {
@@ -316,7 +444,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
                 });
               },
               value: _objectName,
-              items: <String>[ 'Actes de naissance',"Carte nationale d'identité", 'Dilplômes','Ordinateur', 'Passeport','Porte-feuille','Relevé de note','Sac à dos','Sac à main','Télévision','Téléphone portable','Autre...' ]
+              items: <String>[ "Document", 'Ordinateur','Porte-feuille','Sac à dos','Sac à main','Télévision','Téléphone portable','Autre...' ]
                   .map((String value) {
                 return new DropdownMenuItem<String>(
                   value: value,
@@ -327,28 +455,28 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
     );
 
     final otherObject = TextFormField(
-      controller: _otherObjectController,
-      keyboardType: TextInputType.text,
-      autofocus: false,
-      decoration: InputDecoration(
-        hintText: "Autre type d'objet",
-        hintStyle: TextStyle(fontSize: 13,fontStyle: FontStyle.italic,fontFamily: 'Raleway'),
-        prefixIcon: Icon(
-            Icons.devices_other,
-            color: Color(0xffdcd3d3)
-        ),
-        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0)
-        ),
-        enabledBorder: OutlineInputBorder(
-            borderSide: const BorderSide(
-                color: Color(0xffdcdcdc)
+          controller: _otherObjectController,
+          keyboardType: TextInputType.text,
+          autofocus: false,
+          decoration: InputDecoration(
+            hintText: "Autre type d'objet",
+            hintStyle: TextStyle(fontSize: 13,fontStyle: FontStyle.italic,fontFamily: 'Raleway'),
+            prefixIcon: Icon(
+                Icons.devices_other,
+                color: Color(0xffdcd3d3)
             ),
-            borderRadius: BorderRadius.circular(10.0)
-        ),
-      ),
-    );
+            contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0)
+            ),
+            enabledBorder: OutlineInputBorder(
+                borderSide: const BorderSide(
+                    color: Color(0xffdcdcdc)
+                ),
+                borderRadius: BorderRadius.circular(10.0)
+            ),
+          ),
+        );
 
     final townTitle =  new Container(
         width: width/1.15,
@@ -521,88 +649,9 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
               height: height/5.7,
               alignment: Alignment.center,
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-              padding: EdgeInsets.only(top: 15,bottom: 15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-
-                      Container(
-                        width: width/4.2,
-                        height: height/8,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
-                        padding: EdgeInsets.all(2),
-                        child:GestureDetector(
-                          child: _imageList[0].runtimeType == int ? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
-                              :
-                                Image.file(
-                                    _imageList[0],
-                                    width: width/4.5,
-                                    height: height/8,
-                                    fit: BoxFit.cover
-                                ),
-                          onTap: (){
-                            _dialog(context,0);
-                          },
-                        )
-                      ),
-
-                      SizedBox(width: 22),
-
-                      Container(
-                          width: width/4.2,
-                          height: height/8,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
-                          padding: EdgeInsets.all(2),
-                          child:GestureDetector(
-                            child: _imageList[1].runtimeType == int ? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
-                                :
-                                  Image.file(
-                                      _imageList[1],
-                                      width: width/4.5,
-                                      height: height/8,
-                                      fit: BoxFit.cover
-                                  ),
-                            onTap: (){
-                              _dialog(context,1);
-                            },
-                          )
-                      ),
-
-                      SizedBox(width: 22),
-
-                      Container(
-                          width: width/4.2,
-                          height: height/8,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(2),border: Border.all(color: Color(0xffdcdcdc))),
-                          padding: EdgeInsets.all(2),
-                          child:GestureDetector(
-                            child: _imageList[2].runtimeType == int ? Icon(Icons.add_circle,size: 25,color: Colors.pink,)
-                                :
-                                  Image.file(
-                                      _imageList[2],
-                                      width: width/4.5,
-                                      height: height/8,
-                                      fit: BoxFit.cover
-                                  ),
-                            onTap: (){
-                              _dialog(context,2);
-                            },
-                          )
-                      )
-
-                    ],
-                  ),
-
-                ],
-              ),
+              padding: EdgeInsets.only(top: 15,bottom: 15,left: _imageList.length >= 1 ? 30 : 10.0),
+              child: _buildImageListView(),
           ),
-
         );
 
     final amountTitle =  new Container(
@@ -611,7 +660,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
         child: Row(
           children: <Widget>[
             Expanded(
-              child: Text("Which amount can you give to someone who finds your item.",
+              child: Text("Could you be able to reward someone who finds your item?",
                 style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
@@ -624,41 +673,8 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
         )
     );
 
-    final rewardAmount =  new Container(
-        width: width/1.8,
-        padding: EdgeInsets.only(left: 6.5,right: 6.5),
-        child: TextFormField(
-            controller: _rewardController,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.white,
-              hintText: "amount",
-              hintStyle: TextStyle(
-                fontSize: 13.0,
-                fontFamily: 'Raleway'
-              ),
-              enabledBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Color(0xffdcdcdc)),
-                  borderRadius: BorderRadius.circular(10.0)),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              prefixIcon: Icon(
-                Icons.attach_money,
-                color: Color(0xfff4f4f4),
-              ),
-            ),
-            validator: (String value) {
-              if(value.isEmpty) {
-                return "Entrer un montant";
-              }
-            },
-          )
-    );
-
-    final currentcyList =  new Container(
-        width: width/3,
+    final reward =  new Container(
+        width: width/1.2,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),border: Border.all(color: Color(0xffdcdcdc))),
         padding: EdgeInsets.only(left: 25.0, right: 7.0),
         child: DropdownButtonHideUnderline(
@@ -666,22 +682,23 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
               iconEnabledColor: Color(0xffdcdcdc),
               iconSize: 40,
               style: TextStyle(fontWeight: FontWeight.w700,color: Colors.black,fontFamily: 'Raleway'),
-              hint:  _currentcy == null ?
-              Text(_currentcy = "USD")
+              hint:  _isRewarded == null ?
+              Text(_isRewarded = "YES",textAlign: TextAlign.center,)
                   :
-              Text(_currentcy,
+              Text(_isRewarded,
                 style: TextStyle(
                     fontFamily:"Raleway"
                 ),
+                  textAlign: TextAlign.center
               ),
               onChanged: (String changedValue) {
-                _currentcy = changedValue;
+                _isRewarded = changedValue;
                 setState(() {
-                  _currentcy;
+                  _isRewarded;
                 });
               },
-              value: _currentcy,
-              items: <String>[ 'EUR',"USD", 'F CFA']
+              value: _isRewarded,
+              items: <String>[ 'YES',"NO"]
                   .map((String value) {
                 return new DropdownMenuItem<String>(
                   value: value,
@@ -691,46 +708,39 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
         )
     );
 
-    final rewardData = Row(
-
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        rewardAmount,
-        currentcyList
-      ],
-    );
 
     final postAnnounceButton = !_isLoading
         ?
-    FloatingActionButton.extended(
-      icon: Icon(Icons.public),
-      label: Text('POST ANNOUNCEMENT',style: TextStyle(fontFamily: 'Raleway'),
-        ),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10)
-      ),
-      backgroundColor: Colors.pink,
-      heroTag: "post",
-      onPressed: () {
-        _formKey.currentState.validate();
-          if (_isValidForm()) {
-            _submit();
-          } else {
-            _dateController.text.length == 0
-                ?
-                  Toast.show("Please pick the date.", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM)
-                :
-                  Toast.show("Fill the whole form.", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
-          }
-        },
-    )
+          FloatingActionButton.extended(
+            icon: Icon(Icons.public),
+            label: Text('POST ANNOUNCEMENT',style: TextStyle(fontFamily: 'Raleway'),
+              ),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10)
+            ),
+            backgroundColor: Colors.pink,
+            heroTag: "post",
+            onPressed: () {
+              _formKey.currentState.validate();
+                if (_isValidForm()) {
+                  _imageList.length == 0 ? _setImageIfNotSelected(_objectName) : _submit();
+                  _submit();
+                } else {
+                  _dateController.text.length == 0
+                      ?
+                        Toast.show("Please pick the date.", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM)
+                      :
+                        Toast.show("Fill the whole form.", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
+                }
+              },
+          )
         :
-    Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        SpinKitWave(color: Colors.deepPurple,size: 30),
-      ],
-    );
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SpinKitWave(color: Colors.deepPurple,size: 30),
+            ],
+          );
 
 
 
@@ -816,14 +826,14 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
                                     SizedBox(height: 7.0),
                                     phoneTitle,
                                     SizedBox(height: 12.0),
-                                    rewardData,
+                                    reward,
                                     SizedBox(height: 7.0),
                                     amountTitle,
                                     SizedBox(height: 15.0),
-                                    _imageList.length == 0
+                                   /* _imageList.length == 0
                                         ?
                                     Text('Veuillez remplir le formulaire en entier.',textAlign: TextAlign.center,style: TextStyle(fontSize: 16,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),)
-                                        :
+                                        :*/
                                     postAnnounceButton,
                                     SizedBox(height: 25.0),
 
@@ -849,7 +859,9 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
             onTap: _onItemTapped,
           ),
         ),
-        onWillPop: null
+        onWillPop: (){
+            Navigator.of(context).pop();
+        }
     );
   }
 

@@ -1,11 +1,12 @@
-import 'package:findall/Components/Authentication/AuthPage.dart';
+import 'package:findall/Components/LostItems/LostItemsList.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
 
 class PreviewAnnounce extends StatefulWidget {
-
 
   final String objectName;
   final String description;
@@ -33,6 +34,7 @@ class PreviewAnnounce extends StatefulWidget {
 
 class _PreviewAnnounceState extends State<PreviewAnnounce> {
 
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -44,6 +46,63 @@ class _PreviewAnnounceState extends State<PreviewAnnounce> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+  }
+
+  void createLostObject(data)async{
+    setState(() {
+      _isLoading = true;
+    });
+    await db.collection("foundObjectList").add({
+      'objectName': data['objectName'],
+      'town': data['town'],
+      'quarter': data['quarter'],
+      'date': data['date'],
+      'description': data['description'],
+      'contact': data['contact'],
+      'rewardAmount': data['rewardAmount'],
+      'images': data['images'],
+      'userId': data['userId'],
+      'isLost': true,
+    }).then((documentReference) {
+      setState(() {
+        _isLoading = true;
+      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => LostItemsList()
+        ),
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      print(documentReference.documentID);
+    }).catchError((e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print(e);
+    });
+  }
+
+
+  void _publish(imagesUrl,userId) async{
+
+    var dataToSave = {
+      'objectName': widget.objectName,
+      'town': widget.town,
+      'quarter': widget.quarter,
+      'date': widget.date,
+      'description': widget.description,
+      'contact': widget.contact,
+      'rewardAmount': widget.rewardAmount == "YES" ? "Possible" : "No reward",
+      'images': imagesUrl,
+      'userId': userId,
+    };
+
+    createLostObject(dataToSave);
   }
 
   @override
@@ -102,12 +161,20 @@ class _PreviewAnnounceState extends State<PreviewAnnounce> {
                                 return GestureDetector(
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(0),
-                                    child: Image.file(
-                                        widget.images[index],
-                                        width: width/1.1,
-                                        height: height/2.7,
-                                        fit: BoxFit.cover
-                                    ),
+                                    child: widget.images[index].runtimeType == String ?
+                                          Image.network(
+                                              widget.images[index],
+                                              width: width/1.1,
+                                              height: height/2.7,
+                                              fit: BoxFit.cover
+                                          )
+                                        :
+                                          Image.file(
+                                              widget.images[index],
+                                              width: width/1.1,
+                                              height: height/2.7,
+                                              fit: BoxFit.cover
+                                          ),
                                   ),
                                   onTap: () {
                                     photoView(context, widget.images[index]);
@@ -179,7 +246,7 @@ class _PreviewAnnounceState extends State<PreviewAnnounce> {
                               Text('Deal offer:', style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway')),
                               SizedBox(width: 5 ),
                               Expanded(
-                                  child: Text(widget.rewardAmount, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway'))
+                                  child: Text(widget.rewardAmount == "YES" ? "Possible" : "No reward", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,fontFamily: 'Raleway'))
                               )
                             ],
                           ),
@@ -229,17 +296,23 @@ class _PreviewAnnounceState extends State<PreviewAnnounce> {
                               Container(
                                 height: 40,
                                 width: 100,
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Colors.pink),
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                                color: Colors.white,
                                 child: FloatingActionButton.extended(
-                                  label: Text('Back',style: TextStyle(color: Colors.pink,fontFamily: 'Raleway'),),
+                                  label: Text('Back',style: TextStyle(color: Colors.pink,fontFamily: 'Raleway'),
+                                  ),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10)
                                   ),
-                                  backgroundColor: Colors.white,
                                   heroTag: "back",
+                                  backgroundColor: Colors.white,
                                   onPressed: (){
-                                    Navigator.of(context).pop();
-                                  },
+                                        _isLoading
+                                                  ?
+                                                   null
+                                                  :
+                                                   Navigator.of(context).pop();
+                                  }
                                 ),
                               ),
 
@@ -248,27 +321,53 @@ class _PreviewAnnounceState extends State<PreviewAnnounce> {
                               Container(
                                   height: 40,
                                   width: 100,
-                                  child:FloatingActionButton.extended(
-                                    icon: Icon(Icons.public,color: Colors.white),
-                                    label: Text('Publish',
-                                      style: TextStyle(
-                                          fontFamily: 'Raleway'
-                                      ),
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10)
-                                    ),
-                                    backgroundColor: Colors.pink,
-                                    heroTag: "proceed",
-                                    onPressed: (){
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => AuthPage()
-                                        ),
+                                  alignment: Alignment.center,
+                                  color: Colors.pink,
+                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                                  child: _isLoading
+                                      ?
 
-                                      );
-                                    },
+                                        SpinKitCircle(
+                                          color: Colors.deepPurple,
+                                          size: 45.0,
+                                        )
+                                      :
+                                        FloatingActionButton.extended(
+                                            icon: Icon(Icons.public,color: Colors.white),
+                                            label: Text('Publish',
+                                              style: TextStyle(
+                                                  fontFamily: 'Raleway'
+                                              ),
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10)
+                                            ),
+                                            backgroundColor: Colors.pink,
+                                            heroTag: "proceed",
+                                            onPressed: (){
+                                                  getCurrentUser().then((FirebaseUser user){
+                                                    setState(() {
+                                                      _isLoading = true;
+                                                    });
+                                                    compressImage(widget.images).then((compressedImg){
+                                                      setState(() {
+                                                        _isLoading = true;
+                                                      });
+                                                      uploadImage(compressedImg,"lostObjectImages").then((imagesUrl){
+                                                        setState(() {
+                                                          _isLoading = true;
+                                                        });
+                                                        _publish(imagesUrl,user.providerData[0].uid);
+                                                      });
+                                                    });
+                                                  }).catchError((err){
+                                                    setState(() {
+                                                      _isLoading = false;
+                                                    });
+                                                  });
+
+                                              }
+
                                   )
                               )
                             ],
@@ -290,5 +389,5 @@ class _PreviewAnnounceState extends State<PreviewAnnounce> {
     );
   }
 
-
 }
+

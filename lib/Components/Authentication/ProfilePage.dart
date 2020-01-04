@@ -42,7 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _getCurrentUser().then((user){
+    getCurrentUser().then((user){
       setState(() {
         _nameController.text = user.providerData[0].displayName;
         _phoneController.text = user.providerData[0].phoneNumber;
@@ -83,11 +83,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   _submit(){
     Toast.show("Update successfully!.", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
-  }
-
-  Future<FirebaseUser>_getCurrentUser() async{
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    return user;
   }
 
 

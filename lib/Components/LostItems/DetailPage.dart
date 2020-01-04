@@ -20,7 +20,7 @@ class DetailLostPage extends StatefulWidget {
   final List images;
   var profileImg;
   final String postBy;
-  final double rewardAmount;
+  final String rewardAmount;
   final BuildContext context;
 
   DetailLostPage({Key key,
@@ -193,18 +193,18 @@ class _DetailLostPageState extends State<DetailLostPage> {
               width: 50,
               child: widget.profileImg == null
                   ?
-              Icon(Icons.person, size: 45, color: Colors.deepPurple)
+                    Icon(Icons.person, size: 45, color: Colors.deepPurple)
                   :
-              GestureDetector(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Image.network(
-                      widget.profileImg, fit: BoxFit.cover, height: 50, width: 50),
-                ),
-                onTap: () {
-                  photoView(context, widget.profileImg);
-                },
-              )
+                    GestureDetector(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: Image.network(
+                            widget.profileImg, fit: BoxFit.cover, height: 50, width: 50),
+                      ),
+                      onTap: () {
+                        photoView(context, widget.profileImg);
+                      },
+                    )
               ,
             ),
           ],
@@ -388,25 +388,6 @@ class _DetailLostPageState extends State<DetailLostPage> {
         )
     );
 
-    final contact = Container(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Text('Contact:', style: TextStyle(
-                color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12)),
-            SizedBox(width: width / 30),
-            Expanded(child: Text(widget.contact, style: TextStyle(
-                color: Colors.black.withOpacity(0.6),
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-                fontFamily: 'Raleway'),
-              textAlign: TextAlign.justify,
-             )
-            )
-          ],
-        )
-    );
 
     final founderName = Container(
         child: Row(
@@ -448,8 +429,6 @@ class _DetailLostPageState extends State<DetailLostPage> {
           SizedBox(height: height / 35),
           reward,
           SizedBox(height: height / 35),
-          contact,
-          SizedBox(height: height / 35),
           founderName
         ],
       ),
@@ -464,8 +443,6 @@ class _DetailLostPageState extends State<DetailLostPage> {
           height: 50,
           width: width/2.6,
           decoration: BoxDecoration(
-              border: Border.all(color: Colors.white),
-              borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
                     color: Color(0xffd4d4d3),
@@ -492,8 +469,6 @@ class _DetailLostPageState extends State<DetailLostPage> {
           height: 50,
           width: width/2.6,
           decoration: BoxDecoration(
-              border: Border.all(color: Colors.white),
-              borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
                     color: Color(0xffd4d4d3),

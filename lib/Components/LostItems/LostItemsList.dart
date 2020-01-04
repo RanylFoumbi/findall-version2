@@ -191,8 +191,6 @@ class _LostItemsListState extends State<LostItemsList> {
 
   }
 
-
-
   onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -336,7 +334,9 @@ class _LostItemsListState extends State<LostItemsList> {
           onTap: onItemTapped,
         ),
       ),
-      onWillPop: null,
+      onWillPop: (){
+
+      },
     );
   }
 
