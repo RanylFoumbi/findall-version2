@@ -40,6 +40,21 @@ final String ORANGE_MONEY = '+237 656 801 839';
     }
   }
 
+  /*must be accessible in SmsLoginPage and AuthPage Components */
+  void saveUser(user)async{
+    db.collection("users").add({
+      'uid': user.providerData[0].uid,
+      'photoUrl': user.providerData[0].photoUrl,
+      'providerId': user.providerData[0].providerId,
+      'displayName': user.providerData[0].displayName,
+      'email': user.providerData[0].email,
+      'phoneNumber': user.providerData[0].phoneNumber,
+    }).then((documentReference) {
+      print(documentReference.documentID);
+    }).catchError((e) {
+    });
+  }
+
   /*objectType either lost or found*/
   Future uploadImage(imageList,objectType) async{
 

@@ -11,6 +11,7 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 class DetailLostPage extends StatefulWidget {
 
   final int index;
+  final String uid;
   final String objectName;
   final String description;
   final String town;
@@ -18,6 +19,7 @@ class DetailLostPage extends StatefulWidget {
   final String date;
   final String contact;
   final List images;
+  final bool isMine;
   var profileImg;
   final String postBy;
   final String rewardAmount;
@@ -25,6 +27,8 @@ class DetailLostPage extends StatefulWidget {
 
   DetailLostPage({Key key,
     this.index,
+    this.uid,
+    this.isMine,
     this.objectName,
     this.description,
     this.town,
@@ -43,6 +47,7 @@ class DetailLostPage extends StatefulWidget {
 }
 
 class _DetailLostPageState extends State<DetailLostPage> {
+  String _userName;
 
   @override
   void initState() {
@@ -58,6 +63,16 @@ class _DetailLostPageState extends State<DetailLostPage> {
          }
          });
       });
+     /*fetch photoUrl and userName of the user who has the current uid*/
+    db.collection('users').where('uid',isEqualTo: widget.uid)
+        .getDocuments().then((docs){
+        _getUserName(widget.uid).then((uName){
+          setState(() {
+            widget.profileImg = docs.documents[0].data['photoUrl'];
+            _userName = uName;
+          });
+        });
+    });
 
   }
 
@@ -67,6 +82,19 @@ class _DetailLostPageState extends State<DetailLostPage> {
     super.dispose();
   }
 
+  _deleteObject(){
+    print('it has been deleted');
+  }
+
+  _getUserName(userID) async {
+    db.collection('users').where('uid',isEqualTo: userID)
+        .getDocuments().then((docs){
+      setState(() {
+        _userName = docs.documents[0].data['displayName'];
+      });
+    });
+    return _userName;
+  }
 
   Future _boostSearchDialog()async{
 
@@ -199,7 +227,7 @@ class _DetailLostPageState extends State<DetailLostPage> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(50),
                         child: Image.network(
-                            widget.profileImg, fit: BoxFit.cover, height: 50, width: 50),
+                           widget.profileImg , fit: BoxFit.cover, height: 50, width: 50),
                       ),
                       onTap: () {
                         photoView(context, widget.profileImg);
@@ -389,7 +417,7 @@ class _DetailLostPageState extends State<DetailLostPage> {
     );
 
 
-    final founderName = Container(
+    final postUserName = Container(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -398,7 +426,7 @@ class _DetailLostPageState extends State<DetailLostPage> {
                 color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12)
             ),
             SizedBox(width: 20),
-            Expanded(child: Text(widget.postBy, style: TextStyle(
+            Expanded(child: Text(_userName, style: TextStyle(
                 color: Colors.black.withOpacity(0.6),
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
@@ -429,7 +457,7 @@ class _DetailLostPageState extends State<DetailLostPage> {
           SizedBox(height: height / 35),
           reward,
           SizedBox(height: height / 35),
-          founderName
+          postUserName
         ],
       ),
     );
@@ -451,18 +479,33 @@ class _DetailLostPageState extends State<DetailLostPage> {
                 )
               ]
           ),
-          child: FloatingActionButton.extended(
-            icon: Icon(Icons.call,size: 27,color: Colors.white),
-            label: Text('Call',style: TextStyle(fontFamily: "Raleway"),),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)
-            ),
-            backgroundColor: Colors.pink,
-            heroTag: "call"+ widget.index.toString(),
-            onPressed: (){
-              UrlLauncher.launch('tel:'+ widget.contact);
-            },
-          ),
+          child: widget.isMine
+                              ?
+                                FloatingActionButton.extended(
+                                  icon: Icon(Icons.delete,size: 28,color: Colors.white),
+                                  label: Text('Delete',style: TextStyle(fontFamily: "Raleway"),),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                  ),
+                                  backgroundColor: Colors.pink,
+                                  heroTag: "del"+ widget.index.toString(),
+                                  onPressed: (){
+                                    _deleteObject();
+                                  },
+                                )
+                              :
+                                FloatingActionButton.extended(
+                                  icon: Icon(Icons.call,size: 27,color: Colors.white),
+                                  label: Text('Call',style: TextStyle(fontFamily: "Raleway"),),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                  ),
+                                  backgroundColor: Colors.pink,
+                                  heroTag: "call"+ widget.index.toString(),
+                                  onPressed: (){
+                                    UrlLauncher.launch('tel:'+ widget.contact);
+                                  },
+                                ),
         ),
 
         Container(

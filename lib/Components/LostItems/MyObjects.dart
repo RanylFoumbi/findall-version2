@@ -24,12 +24,13 @@ class MyObjects extends StatefulWidget {
 }
 
 class _MyObjectsState extends State<MyObjects> {
+
   List<DocumentSnapshot> _lostList = []; // stores fetched products
   List<DocumentSnapshot> _allData = []; // stores fetched products
   FirebaseUser _user;
   bool _isLoading = false; // track if products fetching
   bool _hasMore = false; // flag for more products available or not
-  int _docPerPage = 3;
+  int _docPerPage = 7;
   DocumentSnapshot _lastDocument; // flag for last document from where next 10 records to be fetched
   int _selectedIndex = 3;
 
@@ -45,8 +46,8 @@ class _MyObjectsState extends State<MyObjects> {
         _user = user;
       });
       /*fetch all objects of the current user from FireStore*/
-      db.collection('foundObjectList').where('userId',isEqualTo: _user == null ? null : _user.providerData[0].uid.toString()).getDocuments().then((allData){
-        print(_user.providerData[0].uid);
+      db.collection('lostObjectList').where('userId',isEqualTo: _user == null ? null : _user.providerData[0].uid.toString()).getDocuments().then((allData){
+
         if(allData.documents.length == 0){
           setState(() {
             _isLoading = false;
@@ -65,7 +66,6 @@ class _MyObjectsState extends State<MyObjects> {
     }).catchError((err){
       print(err);
     });
-
 
     super.initState();
 
@@ -119,69 +119,6 @@ class _MyObjectsState extends State<MyObjects> {
     super.dispose();
   }
 
-  /*Future _loggedDialog()async{
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    return await showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context){
-          return SimpleDialog(
-            backgroundColor: Colors.white,
-            shape: OutlineInputBorder(borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Color(0xffdcdcdc))),
-            contentPadding: EdgeInsets.only(left: 12,top: 25,right: 12,bottom: 5),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  child: Text("You are not yet Logged.",style: TextStyle(fontWeight: FontWeight.w500,fontFamily: "Raleway",fontSize: 17),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-            children: <Widget>[
-
-              Column(
-                children: <Widget>[
-
-                  SizedBox(width: 15),
-
-                  Container(
-                    height: 45,
-                    width: width/3,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Colors.pink),
-                    child: FloatingActionButton.extended(
-                      label: Text('Login now',style: TextStyle(fontSize: 14.5
-                          ,color: Colors.white,fontFamily: 'Raleway',fontWeight: FontWeight.w700),
-                      ),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)
-                      ),
-                      backgroundColor: Colors.pink,
-                      heroTag: "login",
-                      onPressed: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AuthPage()
-                          ),
-
-                        );
-                      },
-                    ),
-                  ),
-
-                  SizedBox(height: 25),
-                ],
-              )
-            ],
-          );
-        }
-    );
-
-
-  }*/
 
   Widget _buildLostItem(BuildContext context, int index){
     double width = MediaQuery.of(context).size.width;
@@ -194,7 +131,7 @@ class _MyObjectsState extends State<MyObjects> {
                       color: Colors.white,
                       child: Container(
                           child: Padding(
-                            padding: const EdgeInsets.only(bottom: 3.0),
+                            padding: const EdgeInsets.only(bottom: 1.5),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
@@ -301,10 +238,11 @@ class _MyObjectsState extends State<MyObjects> {
                                 (context) => DetailLostPage (
                               index: index,
                               context: context,
+                              isMine: true,
                               objectName:_lostList[index].data['objectName'],
                               description: _lostList[index].data['description'],
                               contact: _lostList[index]['contact'],
-                              postBy: _lostList[index].data['userId'],
+                              uid: _lostList[index].data['userId'],
                               images: _lostList[index].data['images'],
                               date: _lostList[index].data['date'],
                               profileImg: _user.providerData[0].photoUrl,
@@ -432,7 +370,7 @@ class _MyObjectsState extends State<MyObjects> {
                     Row(
                       children: <Widget>[
                         SizedBox(width: 5),
-                        Text('About ('+ _lostList.length.toString() +') objects',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 13,fontFamily: 'Raleway')),
+                        Text('About ('+ _lostList.length.toString() +') object(s)',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 13,fontFamily: 'Raleway')),
                       ],
                     ),
 
@@ -502,7 +440,7 @@ class _MyObjectsState extends State<MyObjects> {
                                                                             ),
                                                                           ),
                                                                           
-                                                                          Text('No data found.',style: TextStyle(fontFamily: 'Raleway',fontSize: 15,fontWeight: FontWeight.w300),textAlign: TextAlign.center,)
+                                                                          Text('No data found.',style: TextStyle(fontFamily: 'Raleway',fontSize: 15,fontWeight: FontWeight.bold),textAlign: TextAlign.center,)
                                                                         ],
                                                                       ),
                                                                     )
@@ -539,21 +477,23 @@ class _MyObjectsState extends State<MyObjects> {
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.deepPurple,
           onPressed: (){
-            if(isLoggedIn() != true){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AuthPage()
-                ),
-              );
-            }else{
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => PostAnnounceForm()
-                ),
-              );
-            }
+            userStorage.ready.then((_){
+              if(isLoggedIn() != true){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AuthPage()
+                  ),
+                );
+              }else{
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PostAnnounceForm()
+                  ),
+                );
+              }
+            });
           },
           tooltip: 'Increment',
           child: Icon(Icons.add),

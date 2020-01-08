@@ -1,5 +1,6 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findall/Components/Authentication/AuthPage.dart';
 import 'package:findall/Components/Authentication/ProfilePage.dart';
 import 'package:findall/FakeData/FoundModel.dart';
@@ -10,6 +11,7 @@ import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:findall/Home/HomePage.dart';
 import 'package:findall/Components/LostItems/MyObjects.dart';
 import 'package:findall/Components/LostItems/DetailPage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -22,20 +24,90 @@ class LostItemsList extends StatefulWidget {
 
 class _LostItemsListState extends State<LostItemsList> {
   int _selectedIndex = 2;
-  List lostList;
+  List<DocumentSnapshot>  _lostList = [];
+  List<DocumentSnapshot> _allData = []; // stores fetched products
+  FirebaseUser _user;
+  bool _isLoading = false; // track if products fetching
+  bool _hasMore = false; // flag for more products available or not
+  int _docPerPage = 3;
+  DocumentSnapshot _lastDocument; // flag for last document from where next 10 records to be fetched
 
   @override
   void initState() {
     // TODO: implement initState
+    setState(() {
+      _isLoading = true;
+    });
+    /*fetch all objects of the current user from FireStore*/
+    db.collection('lostObjectList').getDocuments().then((allData){
+
+      if(allData.documents.runtimeType == Null){
+        setState(() {
+          _isLoading = false;
+        });
+      }else{
+        setState(() {
+          _allData = allData.documents;
+          _isLoading = false;
+        });
+        _getObjects();
+      }
+
+    }).catchError((err){
+      print(err);
+    });
     super.initState();
-    lostList = Found().getFoundList();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+
   }
+
+  _getObjects() async{
+
+    if(_allData.length < _docPerPage){
+      setState(() {
+        _hasMore = false;
+        _lostList = _allData;
+      });
+    }else{
+      var _restDoc = _allData.length - _lostList.length;
+
+      print(_restDoc);
+      if(_restDoc >= _docPerPage){
+
+        _lostList.length == 0
+            ?
+        setState(() {
+          _hasMore = true;
+          _lostList.addAll(_allData.getRange(0, _docPerPage));
+          _lastDocument = _lostList[_lostList.length - 1];
+        })
+            :
+        setState(() {
+          _hasMore = true;
+          _lostList.addAll(_allData.getRange(_lostList.lastIndexOf(_lastDocument) , (_lostList.length - 1) + _docPerPage ));
+          _lastDocument = _lostList[_lostList.length - 1];
+        });
+
+      }else{
+        setState(() {
+          _lostList.addAll(_allData.sublist(_lostList.length));
+          _lastDocument = _lostList[_lostList.length - 1];
+          _hasMore = false;
+        });
+      }
+      if(_lostList.length == _allData.length){
+        setState(() {
+          _hasMore = false;
+        });
+      }
+    }
+  }
+
 
 
   Widget _buildLostItem(BuildContext context, int index){
@@ -49,7 +121,7 @@ class _LostItemsListState extends State<LostItemsList> {
             color: Colors.white,
             child: Container(
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 3.0),
+                  padding: const EdgeInsets.only(bottom: 1.5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
@@ -65,42 +137,42 @@ class _LostItemsListState extends State<LostItemsList> {
                           height: height/4.2,
                           fit: BoxFit.cover,
                           repeat: ImageRepeat.noRepeat,
-                          imageUrl: lostList[index].imageUrl[0],
+                          imageUrl: _lostList[index].data['images'][0],
                           placeholder: (context, url) => new SpinKitWave(color: Colors.deepPurple,size: 30),
                           errorWidget: (context, url, error) => new Icon(Icons.error,color: Colors.deepPurple),
                         ),
                       ),
 
+
                       new Container(
                         width: width/2,
-                        height: height/4.35,
                         margin: EdgeInsets.only(left: 5),
                         child: Column(
                           children: <Widget>[
 
                             SizedBox(height: 17 ),
 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Text(lostList[index].objectName, style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),overflow: TextOverflow.ellipsis,textAlign: TextAlign.left),
-                              ],
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              child: Text(_lostList[index].data['objectName'], style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),overflow: TextOverflow.ellipsis,textAlign: TextAlign.left),
                             ),
 
                             SizedBox(height: 18 ),
                             Container(
                                 height: 20,
                                 width: width/2.2,
-                                child: Wrap(
+                                child: Row(
                                   children: <Widget>[
                                     Icon(Icons.date_range, color: Colors.pink, size: 15,),
                                     SizedBox(width: 5 ),
-                                    Text(lostList[index].date, style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway'), overflow: TextOverflow.ellipsis)
+                                    Flexible(
+                                        child: Text(_lostList[index].data['date'], style: TextStyle(color: Colors.black.withOpacity(0.5),fontSize: 13,fontFamily: 'Raleway'), overflow: TextOverflow.ellipsis)
+                                    )
                                   ],
                                 )
                             ),
 
-                            SizedBox(height: 1.5 ),
+                            SizedBox(height: 1.6 ),
 
                             Container(
                               height: 20,
@@ -111,28 +183,14 @@ class _LostItemsListState extends State<LostItemsList> {
                                     SizedBox(width: 5),
                                     Text('Ville:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
                                     SizedBox(width: 3),
-                                    Text(lostList[index].town,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13),overflow: TextOverflow.ellipsis),
+                                    Flexible(
+                                      child:Text(_lostList[index].data['town'],style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13),overflow: TextOverflow.ellipsis),
+                                    )
                                   ]
                               ),
                             ),
 
-                            SizedBox(height: 1.5 ),
-
-                            Container(
-                              height: 20,
-                              width: width/2.2,
-                              child: Row(
-                                  children: <Widget>[
-                                    Icon(Icons.my_location, color: Colors.pink, size: 15),
-                                    SizedBox(width: 5),
-                                    Text('Quartier:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
-                                    SizedBox(width: 3),
-                                    Text(lostList[index].quarter,style: TextStyle(fontWeight: FontWeight.bold,fontFamily: 'Raleway',fontSize: 13),overflow: TextOverflow.ellipsis,),
-                                  ]
-                              ),
-                            ),
-
-                            SizedBox(height: 1.5 ),
+                            SizedBox(height: 1.6 ),
 
                             Container(
                               height: 20,
@@ -143,11 +201,9 @@ class _LostItemsListState extends State<LostItemsList> {
                                     SizedBox(width: 5),
                                     Text('Reward Amount:',style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 11,fontFamily: 'Raleway')),
                                     SizedBox(width: 3),
-                                lostList[index].rewardAmount == 0
-                                    ?
-                                      Text("No reward",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13),overflow: TextOverflow.ellipsis,)
-                                    :
-                                      Text("Possible",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13),overflow: TextOverflow.ellipsis,),
+                                    Flexible(
+                                        child: Text(_lostList[index].data['rewardAmount'],style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13),overflow: TextOverflow.ellipsis,)
+                                    )
                                   ]
                               ),
                             ),
@@ -163,7 +219,7 @@ class _LostItemsListState extends State<LostItemsList> {
                 )
             ),
           ),
-          onTap: (){
+          onTap: ()async{
 
             Navigator.push(
               context,
@@ -172,24 +228,24 @@ class _LostItemsListState extends State<LostItemsList> {
                       (context) => DetailLostPage (
                     index: index,
                     context: context,
-                    objectName:lostList[index].objectName,
-                    description: lostList[index].description,
-                    contact: lostList[index].phone,
-                    postBy: lostList[index].postBy,
-                    images: lostList[index].imageUrl,
-                    date: lostList[index].date,
-                    profileImg: lostList[index].profileImg,
-                    quarter: lostList[index].quarter,
-                    town: lostList[index].town,
-                    rewardAmount: lostList[index].rewardAmount,
+                    isMine: false,
+                    objectName:_lostList[index].data['objectName'],
+                    description: _lostList[index].data['description'],
+                    contact: _lostList[index].data['contact'],
+                    uid: _lostList[index].data['userId'],
+                    images: _lostList[index].data['images'],
+                    date: _lostList[index].data['date'],
+                    quarter: _lostList[index].data['quarter'],
+                    town: _lostList[index].data['town'],
+                    rewardAmount: _lostList[index].data['rewardAmount'],
                   )
               ),
             );
           },
         )
     );
-
   }
+
 
   onItemTapped(int index) {
     setState(() {
@@ -305,19 +361,67 @@ class _LostItemsListState extends State<LostItemsList> {
                       Row(
                         children: <Widget>[
                           SizedBox(width: 5),
-                          Text('About (4) objects',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 13,fontFamily: 'Raleway')),
+                          Text(_isLoading ? 'About (0) object' :'About ('+ _lostList.length.toString() +') object(s)',textAlign: TextAlign.left, style: TextStyle(color: Colors.black.withOpacity(0.6),fontStyle: FontStyle.italic,fontSize: 13,fontFamily: 'Raleway')),
                         ],
                       ),
 
                       Flexible(
-                        child: ListView.builder(
-                          primary: false,
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemBuilder: _buildLostItem,
-                          itemCount: lostList.length,
-                        ),
-                      )
+                        child: _isLoading == true
+                            ?
+                            Container(
+                              height: MediaQuery.of(context).size.height/1.3,
+                              alignment: Alignment.center,
+                              child: SpinKitFadingCircle(color: Colors.deepPurple,
+                                size: 65,
+                              ),
+                            )
+                            :
+                             _lostList.length == 0
+                                                  ?
+                                                  Container(
+                                                    alignment: Alignment.center,
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: <Widget>[
+                                                        Container(
+                                                          padding: EdgeInsets.only(top: MediaQuery.of(context).size.height/4,bottom: 8),
+                                                          alignment: Alignment.center,
+                                                          child: Image.asset("assets/images/noDataFound.png",
+                                                            alignment: Alignment.center,
+                                                            fit: BoxFit.cover,
+                                                            width: MediaQuery.of(context).size.width/1.5,
+                                                          ),
+                                                        ),
+
+                                                        Text('No data found.',style: TextStyle(fontFamily: 'Raleway',fontSize: 15,fontWeight: FontWeight.bold),textAlign: TextAlign.center,)
+                                                      ],
+                                                    ),
+                                                  )
+                                                  :
+                                                    ListView.builder(
+                                                      primary: false,
+                                                      shrinkWrap: true,
+                                                      physics: NeverScrollableScrollPhysics(),
+                                                      itemBuilder: _buildLostItem,
+                                                      itemCount: _lostList.length,
+                                                    ),
+                      ),
+
+                      _hasMore
+                              ?
+                              Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.all(3),
+                                child: FlatButton(
+                                    shape: Border.all(color: Colors.black),
+                                    onPressed: ()=>_getObjects(),
+                                    child: Text('Load More.',style: TextStyle(color: Colors.black,fontSize: 12,fontFamily: 'Raleway'),)
+                                ),
+                              )
+                              :
+                              Container()
+
                     ],
                   ),
                 );

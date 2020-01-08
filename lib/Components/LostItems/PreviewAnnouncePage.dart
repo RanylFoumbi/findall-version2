@@ -52,7 +52,7 @@ class _PreviewAnnounceState extends State<PreviewAnnounce> {
     setState(() {
       _isLoading = true;
     });
-    await db.collection("foundObjectList").add({
+    await db.collection("lostObjectList").add({
       'objectName': data['objectName'],
       'town': data['town'],
       'quarter': data['quarter'],

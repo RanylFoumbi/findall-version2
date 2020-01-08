@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findall/Components/Authentication/AuthPage.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -60,18 +61,24 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _logout() async{
-    userStorage.clear();
-    await googleSignIn.signOut();
-    await facebookLogin.logOut();
-    await FirebaseAuth.instance.signOut();
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder:
-              (context) => AuthPage()
-      ),
-    );
+    userStorage.ready.then((_){
+      db.collection('users').where('uid',isEqualTo: userStorage.getItem('userId')).getDocuments().then((docs){
+//        db.collection('users').document(docs.documents[0].documentID).delete();
+        googleSignIn.signOut();
+        facebookLogin.logOut();
+        FirebaseAuth.instance.signOut();
+        userStorage.clear();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder:
+                  (context) => AuthPage()
+          ),
+        );
+      });
+
+    });
   }
 
 

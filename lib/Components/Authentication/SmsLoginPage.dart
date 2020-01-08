@@ -1,5 +1,6 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:findall/Components/Authentication/ProfilePage.dart';
+import 'package:findall/Components/Authentication/AuthPage.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -135,7 +136,7 @@ class _SMSLoginPageState extends State<SMSLoginPage> {
                   FirebaseAuth.instance.currentUser().then((user) {
                     _signIn().then((user) {
                       userStorage.setItem('userId', user.providerData[0].uid);
-
+                      saveUser(user);
                       _redirect(user);
 
                     }).catchError((err) {

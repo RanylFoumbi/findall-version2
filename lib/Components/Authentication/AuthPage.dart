@@ -82,8 +82,6 @@ class _AuthPageState extends State<AuthPage> {
     });
   }
 
-
-
   onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -143,7 +141,7 @@ class _AuthPageState extends State<AuthPage> {
       case 5:{
         userStorage.ready.then((_){
 
-            if(!isLoggedIn()){
+            if(isLoggedIn() != true){
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -260,17 +258,17 @@ class _AuthPageState extends State<AuthPage> {
                       color: Color(0xffea4335),
                     ),
                     child:FloatingActionButton.extended(
-                          backgroundColor: Color(0xffea4335),
-                          heroTag: "google",
-                          shape: OutlineInputBorder(borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Color(0xffea4335))),
-                          icon: Icon(FontAwesomeIcons.google,color: Colors.white,size: 18),
-                          label: Text("With Google",style: TextStyle(color: Colors.white,fontFamily: "Raleway"),
+                            backgroundColor: Color(0xffea4335),
+                            heroTag: "google",
+                            shape: OutlineInputBorder(borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Color(0xffea4335))),
+                            icon: Icon(FontAwesomeIcons.google,color: Colors.white,size: 18),
+                            label: Text("With Google",style: TextStyle(color: Colors.white,fontFamily: "Raleway"),
                           ),
-                          onPressed: (){
+                          onPressed: ()async{
                             _signInWithGoogle().then((user){
-                              print(user.providerData[0].runtimeType);
-
+                              print(user.providerData);
                               userStorage.setItem('userId', user.providerData[0].uid);
+                              saveUser(user);
                               _redirect(user,'Google');
                             }).catchError((err){
                               noInternet(context, "Veillez verifier votre connexion internet puis reessayer");
@@ -297,9 +295,10 @@ class _AuthPageState extends State<AuthPage> {
                           icon: Icon(FontAwesomeIcons.facebookF,color: Colors.white,size: 18),
                           label: Text("With Facebook",style: TextStyle(color: Colors.white,fontFamily: "Raleway"),
                           ),
-                          onPressed: (){
+                          onPressed: ()async{
                               _signInWithFacebook().then((FirebaseUser user) {
                                       userStorage.setItem('userId', user.providerData[0].uid);
+                                       saveUser(user);
                                       _redirect(user,'Facebook');
                               }).catchError((err){
                                 print(err);

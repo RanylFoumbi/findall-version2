@@ -280,13 +280,13 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
     switch (objectName) {
       case 'Document':
         {
-          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2Fdocument.png?alt=media&token=541369a6-ebce-407e-8584-95336b84be44");
         }
         break;
 
       case 'Ordinateur':
         {
-          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2Fordinateur.png?alt=media&token=34b5e44c-fc9e-4985-96da-5458ec9d9716");
         }
         break;
 
@@ -304,25 +304,19 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
 
       case 'Sac à main':
         {
-          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
-        }
-        break;
-
-      case 'Télévision':
-        {
-          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2Fsac%20a%20main.png?alt=media&token=c86e9540-8487-4c38-ad0a-9a30623162b1");
         }
         break;
 
       case 'Téléphone portable':
         {
-          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2Ftelephone.png?alt=media&token=ef2d7e0b-d388-494f-9560-89a1f2dbb13f");
         }
         break;
 
       case 'Autre...':
         {
-          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2FArtboard%208%20copy%202.png?alt=media&token=53e56c40-0f77-4d74-9bcd-606ecce4ff9c");
+          _imageList.add("https://firebasestorage.googleapis.com/v0/b/findall-11e21.appspot.com/o/staticImages%2Fautre.png?alt=media&token=ba5ed8a8-f9ce-4339-8583-9fb5c839de82");
         }
         break;
     }
@@ -444,7 +438,7 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
                 });
               },
               value: _objectName,
-              items: <String>[ "Document", 'Ordinateur','Porte-feuille','Sac à dos','Sac à main','Télévision','Téléphone portable','Autre...' ]
+              items: <String>[ "Document", 'Ordinateur','Porte-feuille','Sac à dos','Sac à main','Téléphone portable','Autre...' ]
                   .map((String value) {
                 return new DropdownMenuItem<String>(
                   value: value,
@@ -783,59 +777,59 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
                                   scrollDirection: Axis.vertical,
                                   padding: EdgeInsets.only(left: 15,right: 15),
                                   children: <Widget>[
-                                    datePicker,
-                                    SizedBox(height: 7.0),
-                                    dateTitle,
-                                    SizedBox(height: 12.0),
-                                    objectNames,
-                                    SizedBox(height: 7.0),
-                                    objectTitle,
-                                    _objectName == 'Autre...'
-                                        ?
-                                    SizedBox(height: 12.0)
-                                        :
-                                    SizedBox(height: 0.0),
-                                    _objectName == 'Autre...'
-                                        ?
-                                    otherObject
-                                        :
-                                    SizedBox(height: 0.0),
+                                        datePicker,
+                                        SizedBox(height: 7.0),
+                                        dateTitle,
+                                        SizedBox(height: 12.0),
+                                        objectNames,
+                                        SizedBox(height: 7.0),
+                                        objectTitle,
+                                        _objectName == 'Autre...'
+                                            ?
+                                        SizedBox(height: 12.0)
+                                            :
+                                        SizedBox(height: 0.0),
+                                        _objectName == 'Autre...'
+                                            ?
+                                        otherObject
+                                            :
+                                        SizedBox(height: 0.0),
 
-                                    SizedBox(height: 12.0),
-                                    town,
-                                    SizedBox(height: 7.0),
-                                    townTitle,
-                                    _townName == 'Autre...'
-                                        ?
-                                    SizedBox(height: 12.0)
-                                        :
-                                    SizedBox(height: 0.0),
-                                    _townName == 'Autre...'
-                                        ?
-                                    otherTown
-                                        :
-                                    SizedBox(height: 0.0),
-                                    SizedBox(height: 12.0),
-                                    quarter,
-                                    SizedBox(height: 12.0),
-                                    description,
-                                    SizedBox(height: 12.0),
-                                    camera,
-                                    SizedBox(height: 10.0),
-                                    phone,
-                                    SizedBox(height: 7.0),
-                                    phoneTitle,
-                                    SizedBox(height: 12.0),
-                                    reward,
-                                    SizedBox(height: 7.0),
-                                    amountTitle,
-                                    SizedBox(height: 15.0),
-                                   /* _imageList.length == 0
-                                        ?
-                                    Text('Veuillez remplir le formulaire en entier.',textAlign: TextAlign.center,style: TextStyle(fontSize: 16,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),)
-                                        :*/
-                                    postAnnounceButton,
-                                    SizedBox(height: 25.0),
+                                        SizedBox(height: 12.0),
+                                        town,
+                                        SizedBox(height: 7.0),
+                                        townTitle,
+                                        _townName == 'Autre...'
+                                            ?
+                                        SizedBox(height: 12.0)
+                                            :
+                                        SizedBox(height: 0.0),
+                                        _townName == 'Autre...'
+                                            ?
+                                        otherTown
+                                            :
+                                        SizedBox(height: 0.0),
+                                        SizedBox(height: 12.0),
+                                        quarter,
+                                        SizedBox(height: 12.0),
+                                        description,
+                                        SizedBox(height: 12.0),
+                                        camera,
+                                        SizedBox(height: 10.0),
+                                        phone,
+                                        SizedBox(height: 7.0),
+                                        phoneTitle,
+                                        SizedBox(height: 12.0),
+                                        reward,
+                                        SizedBox(height: 7.0),
+                                        amountTitle,
+                                        SizedBox(height: 15.0),
+                                       /* _imageList.length == 0
+                                            ?
+                                        Text('Veuillez remplir le formulaire en entier.',textAlign: TextAlign.center,style: TextStyle(fontSize: 16,fontWeight: FontWeight.w700,fontFamily: 'Raleway'),)
+                                            :*/
+                                        postAnnounceButton,
+                                        SizedBox(height: 25.0),
 
                                   ],
                                 )
