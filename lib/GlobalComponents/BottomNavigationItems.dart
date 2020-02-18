@@ -1,0 +1,73 @@
+
+import 'package:flutter/material.dart';
+
+  List<BottomNavigationBarItem> bottomNavigationItems() {
+    return [
+      BottomNavigationBarItem(
+        icon: Icon(Icons.home,color: Color(0xff8D8D8D),),
+        title: Text('Accueil',style: TextStyle(fontFamily: 'Raleway')),
+        activeIcon: Icon(Icons.home,color: Color(0xff7F0397),),
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.view_list,color: Color(0xff8D8D8D),),
+        title: Text('Trouvés',style: TextStyle(fontFamily: 'Raleway')),
+        activeIcon: Icon(Icons.view_list,color: Color(0xff7F0397),),
+      ),
+      BottomNavigationBarItem(
+        icon: IconTheme(data: null, child: Image.asset("assets/images/lostitems1.png",
+          alignment: Alignment.center,
+          fit: BoxFit.cover,
+          height: 21,
+          width: 21,
+         ),
+        ),
+        title: Text('Perdus',style: TextStyle(fontFamily: 'Raleway')),
+        activeIcon: IconTheme(data: null, child: Image.asset("assets/images/lostitems.png",
+          alignment: Alignment.center,
+          fit: BoxFit.cover,
+          height: 21,
+          width: 21,
+        ),
+        ),
+      ),
+      BottomNavigationBarItem(
+        icon: IconTheme(data: null, child: Image.asset("assets/images/add1.png",
+          alignment: Alignment.center,
+          fit: BoxFit.cover,
+          height: 21,
+          width: 21,
+        ),
+       ),
+        title: Text('Mes objets',style: TextStyle(fontFamily: 'Raleway')),
+        activeIcon: IconTheme(data: null, child: Image.asset("assets/images/add.png",
+          alignment: Alignment.center,
+          fit: BoxFit.cover,
+          height: 21,
+          width: 21,
+        ),
+        ),
+      ),
+      BottomNavigationBarItem(
+        icon: IconTheme(data: null, child: Image.asset("assets/images/search-tool1.png",
+          alignment: Alignment.center,
+          fit: BoxFit.cover,
+          height: 21,
+          width: 21,
+         ),
+        ),
+        title: Text('Search',style: TextStyle(fontFamily: 'Raleway')),
+        activeIcon: IconTheme(data: null, child: Image.asset("assets/images/search-tool.png",
+          alignment: Alignment.center,
+          fit: BoxFit.cover,
+          height: 21,
+          width: 21,
+         ),
+        ),
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.person,color: Color(0xff8D8D8D),),
+        title: Text('Compte',style: TextStyle(fontFamily: 'Raleway')),
+        activeIcon: Icon(Icons.person,color: Color(0xff7F0397),),
+      ),
+    ];
+  }
