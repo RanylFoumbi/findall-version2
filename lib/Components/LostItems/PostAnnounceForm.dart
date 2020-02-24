@@ -28,7 +28,6 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
   var _descriptionController = TextEditingController();
   var _phoneController = TextEditingController();
 //  var _dateController = TextEditingController();
-  bool _isLoadingImg = false;
   bool _isLoading = false;
   List _imageList = [];
   String _objectName;
@@ -215,9 +214,6 @@ class _PostAnnounceFormState extends State<PostAnnounceForm> {
   _getImage(context,option) async{
     var picture;
     Navigator.of(context).pop();
-    setState(() {
-      _isLoadingImg = true;
-    });
     if(option == 'camera'){
       File photo = await ImagePicker.pickImage(source: ImageSource.camera);
       if(photo.lengthSync() == 0){

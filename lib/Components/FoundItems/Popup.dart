@@ -162,58 +162,60 @@ class _PopupState extends State<Popup> {
 
             SizedBox(height: 15),
 
-            Row(
-              children: <Widget>[
+            new Container(
+                width: 230,
+                padding: EdgeInsets.only(left: 5.0, right: 5.0),
+                child:Column(
+                  children: <Widget>[
 
-                SizedBox(width: 20),
-
-                Container(
-                  height: 40,
-                  width: 85,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: Colors.pink),
-                  child: FloatingActionButton.extended(
-                    label: Text('Retour',style: TextStyle(color: Colors.pink,fontFamily: 'Raleway'),),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)
-                    ),
-                    backgroundColor: Colors.white,
-                    heroTag: "cancel",
-                    onPressed: (){
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ),
-
-                SizedBox(width: 25),
-
-                Container(
-                    height: 40,
-                    width: 85,
-                    child:FloatingActionButton.extended(
-                      label: Text('Continuer',
-                        style: TextStyle(
-                          fontFamily: 'Raleway'
-                        ),
-                      ),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)
-                      ),
-                      backgroundColor: Colors.deepPurple,
-                      heroTag: "next",
-                      onPressed: (){
-                        Navigator.push(
-                          context,
-                            MaterialPageRoute(
-                                builder: (context) => FoundedItemsList(
-                                  town: _townName == 'Autre...' ? _otherTownController.text.toLowerCase() : _townName.toLowerCase(),
-                                )
+                    Container(
+                        width: 230,
+                        child:FloatingActionButton.extended(
+                          label: Text('Continuer',
+                            style: TextStyle(
+                                fontFamily: 'Raleway'
                             ),
-                        );
-                      },
-                    )
+                          ),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)
+                          ),
+                          backgroundColor: Colors.deepPurple,
+                          heroTag: "next",
+                          onPressed: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => FoundedItemsList(
+                                    town: _townName == 'Autre...' ? _otherTownController.text.toLowerCase() : _townName.toLowerCase(),
+                                  )
+                              ),
+                            );
+                          },
+                        )
+                    ),
+
+                    SizedBox(height: 15),
+
+                    Container(
+                      width: 230,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                      child: FloatingActionButton.extended(
+                        label: Text('Retour',style: TextStyle(color: Colors.pink,fontFamily: 'Raleway'),),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        backgroundColor: Colors.white,
+                        heroTag: "cancel",
+                        onPressed: (){
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+
+                  ],
                 )
-              ],
-            )
+
+    )
 
           ],
         )

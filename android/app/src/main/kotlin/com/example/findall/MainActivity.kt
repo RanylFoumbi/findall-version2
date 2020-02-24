@@ -1,4 +1,4 @@
-package com.example.findall
+package com.ranolf.findall
 
 import android.os.Bundle
 import io.flutter.app.FlutterActivity

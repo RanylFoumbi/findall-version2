@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findall/Components/Authentication/AuthPage.dart';
 import 'package:findall/Components/FoundItems/FoundedItemsList.dart';
 import 'package:findall/GlobalComponents/Utilities.dart';
@@ -38,7 +37,6 @@ class _ProfilePageState extends State<ProfilePage> {
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   var _profileImg;
-  bool _isEnable = true;
   int _nbrOfLostItems = 0;
   int _nbrOfFoundItems = 0;
   int _totalItems;
@@ -98,15 +96,15 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
 
-  bool _isValidForm() {
+ /* bool _isValidForm() {
     return _nameController.text.length > 0 ||
         _phoneController.text.length > 0 ||
         _emailController.text.length > 0 ;
-  }
+  }*/
 
-  _submit(){
+  /*_submit(){
     Toast.show("Mis à jour avec succès!.", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
-  }
+  }*/
 
 
 

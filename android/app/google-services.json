@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:112468913407:android:760ed3902f814eccf630ca",
         "android_client_info": {
-          "package_name": "com.example.findall"
+          "package_name": "com.ranolf.findall"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "112468913407-0kg6u3421niifqvegppnprbi8kqlvt4o.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.findall",
+            "package_name": "com.ranolf.findall",
             "certificate_hash": "2a4cec0d5c55465a6b3a6cd8e4952a708aa6945e"
           }
         },

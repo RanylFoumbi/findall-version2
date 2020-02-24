@@ -91,13 +91,13 @@ class _DetailFoundPageState extends State<DetailFoundPage> {
             }
         ),
 
-        SizedBox(width: width / 2.4),
+        SizedBox(width: width / 2.5),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Text('Trouvé par' + ' ', style: TextStyle(color: Colors.grey,
                 fontWeight: FontWeight.bold,
-                fontSize: 15,
+                fontSize: 13.5,
                 fontFamily: 'Raleway'),
               textAlign: TextAlign.justify,
             ),

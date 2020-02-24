@@ -10,7 +10,6 @@ import 'package:findall/GlobalComponents/Utilities.dart';
 import 'package:findall/Home/HomePage.dart';
 import 'package:findall/Components/MyObjects.dart';
 import 'package:findall/Components/LostItems/DetailPage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
